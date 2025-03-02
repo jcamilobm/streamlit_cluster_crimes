@@ -1,0 +1,14 @@
+# Almacena parámetros configurables del modelo y la app (no rutas).
+# Es un archivo estático (solo datos).
+# Ideal para parámetros que no requieren lógica (números, listas, textos).
+paths:
+  raw_data:
+    crimenes: data/raw/delitos.csv       # Ej: Delitos reportados
+    poblacion: data/raw/poblacion.csv  # Ej: Datos demográficos
+    geolocalizacion: data/raw/geolocalizacion.csv  # Ej: Coordenadas de zonas
+
+    
+clustering:
+  n_clusters: 4  # Valor por defecto
+  variables: [densidad_poblacional, robos_log]
+  scaler: RobustScaler   # Tipo de escalado (RobustScaler, StandardScal
