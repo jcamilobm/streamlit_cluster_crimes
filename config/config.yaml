@@ -3,12 +3,12 @@
 # Ideal para parámetros que no requieren lógica (números, listas, textos).
 paths:
   raw_data:
-    crimenes: data/raw/delitos.csv       # Ej: Delitos reportados
-    poblacion: data/raw/poblacion.csv  # Ej: Datos demográficos
-    geolocalizacion: data/raw/geolocalizacion.csv  # Ej: Coordenadas de zonas
+    crimes: data/raw/delitos.csv           # Example: Reported crimes
+    population: data/raw/poblacion.csv     # Example: Demographic data
+    geolocation: data/raw/geolocalizacion.csv  # Example: Zone coordinates
 
-    
 clustering:
-  n_clusters: 4  # Valor por defecto
-  variables: [densidad_poblacional, robos_log]
-  scaler: RobustScaler   # Tipo de escalado (RobustScaler, StandardScal
+  models: kmeans                          # Options: kmeans, hierarchical
+  n_clusters: 4  
+  variables: [population_density, theft_log]
+  scaler: RobustScaler                     # Scaling type (RobustScaler, StandardScaler)
