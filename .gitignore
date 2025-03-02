@@ -1,0 +1,25 @@
+# Ignorar archivos y directorios específicos de Streamlit
+*.pyc
+__pycache__/
+*.log
+
+# Archivos de dependencias y entorno virtual
+env/
+venv/
+*.env
+
+# Archivos generados por Streamlit
+.cache/
+
+# Ignorar configuraciones específicas de IDEs
+.vscode/
+.idea/
+
+# Archivos de configuración personal de editor de texto
+*.swp
+
+# Archivos generados por Jupyter Notebooks
+.ipynb_checkpoints/
+
+# Archivos temporales
+*.tmp
