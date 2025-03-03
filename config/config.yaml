@@ -3,9 +3,9 @@
 # Ideal para parámetros que no requieren lógica (números, listas, textos).
 paths:
   raw_data:
-    crimes: data/raw/delitos.csv           # Example: Reported crimes
-    population: data/raw/poblacion.csv     # Example: Demographic data
-    geolocation: data/raw/geolocalizacion.csv  # Example: Zone coordinates
+    crimes: "https://raw.githubusercontent.com/jcamilobm/streamlit_cluster_crimes/main/data/raw/delitos_bucaramanga_2016_2023.csv" #  data/raw/delitos_bucaramanga_2016_2023.csv
+    population: "https://raw.githubusercontent.com/jcamilobm/streamlit_cluster_crimes/main/data/raw/proyeccion_poblacion_Bucaramanga_2021_comunas.csv" # data/raw/proyeccion_poblacion_Bucaramanga_2021_comunas.csv
+    geolocation: "https://raw.githubusercontent.com/jcamilobm/streamlit_cluster_crimes/main/data/raw/comunas_bucaramanga.geojson" # data/raw/comunas_bucaramanga.geojson
 
 clustering:
   models: kmeans                          # Options: kmeans, hierarchical
