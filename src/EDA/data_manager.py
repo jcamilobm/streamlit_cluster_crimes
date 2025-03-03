@@ -37,7 +37,13 @@ dtype_crimes = {
     'cantidad_unica': 'int64'
 }
 
-@st.cache_data(show_spinner="⌛Cargando tablas...")  
+#import streamlit as st
+#import pandas as pd
+#import geopandas as gpd
+
+
+
+@st.cache_data(show_spinner="🧹Cargando  y limpiando datos...")  
 def load_all_data_and_clean(config_path: str = "config/config.yaml"):
     """
     Carga la configuración desde config_path y carga los DataFrames.
@@ -60,8 +66,4 @@ def load_all_data_and_clean(config_path: str = "config/config.yaml"):
     df_poblacion = eda_pobl(df_poblacion)
 
     return df_crimes, df_poblacion, df_geolocation, config
-
-
-
-
 
