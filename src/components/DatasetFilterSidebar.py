@@ -20,11 +20,12 @@ def DatasetFilterSidebar(df):
     st.sidebar.header(' 🌪️ Filtrar datos')
 
     with st.sidebar.form(key='filter_data_form', clear_on_submit=False):
-        #  Asegurar que 'fecha_hecho' sea dateti
         
-        fecha_min, fecha_max = df['fecha_hecho'].min(), df['fecha_hecho'].max()
-        fecha_rango = st.date_input('Selecciona el rango', [fecha_min, fecha_max], min_value=fecha_min, max_value=fecha_max)
-        fecha_inicio, fecha_fin = fecha_rango if len(fecha_rango) == 2 else (fecha_min, fecha_max)
+        # Obtener el rango de años disponibles
+        year_min, year_max = df['year'].min(), df['year'].max()
+
+        # Selección del rango de años
+        year_rango = st.slider('Selecciona el rango de años', year_min, year_max, (year_min, year_max))
 
         #  Características de la víctima
         with st.expander(' Características de la víctima', expanded=False):
@@ -46,7 +47,7 @@ def DatasetFilterSidebar(df):
         st.sidebar.warning("⚠️ Debes seleccionar al menos un valor en cada filtro.")
 
     # Filtrar los datos
-    filtered_data = filtrar_datos(df, fecha_inicio, fecha_fin,
+    filtered_data = filtrar_datos(df, year_rango[0] , year_rango[1],
                                    sexo, movil_victima, curso_vida, 
                                    momento_del_dia, tipo_amenaza)
 
@@ -54,16 +55,11 @@ def DatasetFilterSidebar(df):
 
 
 
-
-# Función para filtrar los datos
-# Se cachea para que se ejecute solo si cambia al menos un filtro 
-@st.cache_data(show_spinner="⌛Filtrando datos...")
-def filtrar_datos(df, fecha_inicio, fecha_fin, sexo, movil_victima, 
+@st.cache_data(show_spinner="⌛ Filtrando datos...")
+def filtrar_datos(df, year_inicio, year_fin, sexo, movil_victima, 
                   curso_vida, momento_del_dia, tipo_amenaza):
-    #time.sleep(4)
     return df[
-        (df['fecha_hecho'] >= fecha_inicio) &
-        (df['fecha_hecho'] <= fecha_fin) &
+        (df['year'].between(year_inicio, year_fin)) &
         (df['sexo'].isin(sexo)) &
         (df['movil_victima'].isin(movil_victima)) &
         (df['curso_vida'].isin(curso_vida)) &

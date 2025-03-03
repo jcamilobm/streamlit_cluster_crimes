@@ -16,13 +16,13 @@ st.title("Inicio")
 
 # 1. Carga de datos y config, todo en una función centralizada
 df_crimes , df_pobl , df_geo , config = load_all_data_and_clean()
-
+#st.dataframe(df_crimes)
 # 2. 
 
 
 # 3. 
 df_crimesf = DatasetFilterSidebar(df_crimes)
 
-
+st.dataframe(df_crimesf)
 st.write(df_crimes.shape)
 st.write(df_crimesf.shape)

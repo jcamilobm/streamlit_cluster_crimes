@@ -1,3 +1,5 @@
+import streamlit as st
+
 from pathlib import Path
 from src.utils.config_loader import load_config
 from src.EDA.load_data import load_data
