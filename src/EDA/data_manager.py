@@ -1,5 +1,3 @@
-import streamlit as st
-
 from pathlib import Path
 from src.utils.config_loader import load_config
 from src.EDA.load_data import load_data
@@ -36,11 +34,6 @@ dtype_crimes = {
     'nom_com': 'object',
     'cantidad_unica': 'int64'
 }
-
-#import streamlit as st
-#import pandas as pd
-#import geopandas as gpd
-
 
 
 @st.cache_data(show_spinner="🧹Cargando  y limpiando datos...")  

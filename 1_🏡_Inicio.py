@@ -2,9 +2,7 @@ import streamlit as st
 from streamlit import session_state as ss
 
 from src.EDA.data_manager import load_all_data_and_clean
-
-# Importamos el lector de config y la función para cargar datos
-
+from src.components.DatasetFilterSidebar import DatasetFilterSidebar
 
 st.set_page_config(
     page_title="Inicio: Resultados Clustering",
@@ -13,13 +11,18 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-st.title("Main Page")
+st.title("Inicio")
 
 
-# Carga de datos y config, todo en una función centralizada
+# 1. Carga de datos y config, todo en una función centralizada
 df_crimes , df_pobl , df_geo , config = load_all_data_and_clean()
 
-st.dataframe(df_pobl)
+# 2. 
 
 
-st.dataframe(df_crimes)
+# 3. 
+df_crimesf = DatasetFilterSidebar(df_crimes)
+
+
+st.write(df_crimes.shape)
+st.write(df_crimesf.shape)
