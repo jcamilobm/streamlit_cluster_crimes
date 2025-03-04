@@ -10,14 +10,6 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 warnings.simplefilter(action='ignore', category=SettingWithCopyWarning)
 
 
-import pandas as pd
-import geopandas as gpd
-import requests
-import io
-
-import pandas as pd
-import geopandas as gpd
-
 def load_data(file_path, dtypes=None):
     """
     Carga archivos CSV o GeoJSON desde rutas locales o URLs sin redundancias.

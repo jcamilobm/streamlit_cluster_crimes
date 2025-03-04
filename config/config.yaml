@@ -1,4 +1,3 @@
-# Almacena parámetros configurables del modelo y la app (no rutas).
 # Es un archivo estático (solo datos).
 # Ideal para parámetros que no requieren lógica (números, listas, textos).
 paths:
