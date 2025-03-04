@@ -1,6 +1,7 @@
 import streamlit as st
 from src.EDA.data_manager import load_all_data_and_clean
 from src.components.DatasetFilterSidebar import DatasetFilterSidebar
+from src.models.model_data_preparation import get_model_data
 
 st.set_page_config(
     page_title="Experimentos modelos",
@@ -27,3 +28,10 @@ else:
 
 # 3. Dibujar side y filtrar datos
 df_crimesf = DatasetFilterSidebar(df_crimes)
+
+
+# Obtener tabla para los modelos de machine learning
+
+df_model = get_model_data(df_crimesf, df_poblacion , df_geo)
+
+st.dataframe(df_model)

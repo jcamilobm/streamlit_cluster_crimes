@@ -3,7 +3,7 @@ import streamlit as st
 from pathlib import Path
 from src.utils.config_loader import load_config
 from src.EDA.load_data import load_data
-from src.EDA.data_processing_gdf import eda_gdf
+from src.EDA.data_processing_gdf import eda_df_geo
 from src.EDA.data_processing_crimes import eda_crimes
 from src.EDA.data_processing_poblacion import eda_pobl
 
@@ -55,7 +55,7 @@ def load_all_data_and_clean(config_path: str = "config/config.yaml"):
     df_crimes = eda_crimes(df_crimes)
 
     df_geolocation = load_data(geolocation_path)
-    df_geolocation = eda_gdf(df_geolocation)
+    df_geolocation = eda_df_geo(df_geolocation)
 
     df_poblacion = load_data(population_path)
     df_poblacion = eda_pobl(df_poblacion)
