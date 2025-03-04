@@ -32,6 +32,19 @@ df_crimesf = DatasetFilterSidebar(df_crimes)
 
 # Obtener tabla para los modelos de machine learning
 
-df_model = get_model_data(df_crimesf, df_poblacion , df_geo)
+df_model , df_identifiers = get_model_data(df_crimesf, df_poblacion , df_geo)
 
+st.dataframe(df_model)
+st.dataframe(df_identifiers)
+
+
+
+# Filtro para seleccionar columnas
+columnas_seleccionadas = st.multiselect(
+    'Selecciona las columnas a mostrar', 
+    options=df_model.columns,  # Las opciones son las columnas del DataFrame
+    default=df_model.columns.tolist()  # Predeterminado: mostrar todas las columnas
+)
+
+df_model  = df_model[columnas_seleccionadas]
 st.dataframe(df_model)

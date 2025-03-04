@@ -1,6 +1,7 @@
 import streamlit as st
 
 import pandas as pd
+import numpy as np
 from sklearn.preprocessing import StandardScaler
 
 
@@ -38,8 +39,59 @@ def prepare_rows(df_crimesf, df_poblacion , df_geo):
     return df_pivot 
 
 
+# 2) Column Preparation (No null values)
+def clean_columns(df_pivot):
+    df_pivot = df_pivot.dropna() # aunque esto ya se garantizo con filll_value = 0 en prepare_rows
+    return df_pivot
 
-def get_model_data(df_crimesf, df_poblacion , df_geo):
-    df_pivot = prepare_rows(df_crimesf, df_poblacion , df_geo)
+
+# 3) Feature Engineering (New columns) y/o transformar variables crudas para que representen patrones más útiles para el modelo.
+def feature_engineering(df_pivot):
+    df_pivot['poblacional_km2'] = df_pivot['personas'] / df_pivot['area']
+    df_pivot["manzanas_km2"] = df_pivot["manzanas"] / df_pivot["area"]
+    df_pivot = calcular_tasas_por_habitantes(df_pivot)
+
+    
 
     return df_pivot
+
+def calcular_tasas_por_habitantes(df_pivot):
+    crimenes = ['Crimen Organizado', 'Delitos Sexuales',
+                'Delitos Violentos', 'Robos y Hurtos', 'Violencia Familiar']
+    
+    cada_X_habitantes = 1000
+
+    for crimen in crimenes:
+        nombre_tasa = crimen.lower().replace(' ', '_') + f'_por_{cada_X_habitantes}hab'
+        df_pivot[nombre_tasa] = ((df_pivot[crimen] / df_pivot['personas']) * cada_X_habitantes).round(2)
+
+        nombre_log = nombre_tasa + '_log'
+        df_pivot[nombre_log] = np.log1p(df_pivot[nombre_tasa])
+
+    return df_pivot
+
+
+# 4) Separar identificadores de variables del modelo
+# Es decir, el nombre d eal comuna y su id no van en modelo
+def split_identifiers(df_pivot):
+    columns_to_remove = ['num_com', 'nombre_com']
+    df_identifiers = df_pivot[columns_to_remove]
+    df_model  = df_pivot.drop(columns=columns_to_remove)
+    return df_model , df_identifiers
+
+
+
+#5) Feature Selection: se hara desde app interactiva
+
+# Funcion osquestadora:
+def get_model_data(df_crimesf, df_poblacion , df_geo):
+
+    df_pivot = prepare_rows(df_crimesf, df_poblacion , df_geo)
+
+    df_pivot = clean_columns(df_pivot)
+
+    df_pivot = feature_engineering(df_pivot)
+
+    df_model , df_identifiers =  split_identifiers(df_pivot)
+
+    return df_model , df_identifiers
