@@ -48,3 +48,39 @@ columnas_seleccionadas = st.multiselect(
 
 df_model  = df_model[columnas_seleccionadas]
 st.dataframe(df_model)
+
+
+st.markdown("---")
+# Filtros principales (fuera del sidebar)
+st.header('🔧 Configuración del Modelo')
+
+# Disposición en columnas para mejor organización visual
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    model_type = st.selectbox('Seleccionar modelo:', ['K-means', 'Clustering Jerárquico'],
+                              help="Modelo para agrupar comunas similares.")
+
+with col2:
+    #n_clusters = st.slider('Número de Clusters:', 2, 10, 3)
+    # Selección del número de clusters con un widget interactivo (+ y -)
+    n_clusters = st.number_input('Número de Clusters:', min_value=2, max_value=6, value=3, step=1,help="Número de grupos de comunas")
+
+
+with col3:
+    scaling_method = st.selectbox('Método de escalado:', 
+                                  ['StandardScaler (Z-score)', 'MinMaxScaler (0-1)', 'RobustScaler'],
+                                  help="StandardScaler: media 0, varianza 1. MinMaxScaler: 0 a 1, afectado por outliers. RobustScaler: usa mediana, resistente a outliers.")
+    
+
+        
+
+# Botones para ejecutar el modelo y borrar resultados
+col_run, col_reset = st.columns(2)
+run_model = col_run.button('🚀 Ejecutar Modelo', type="primary")
+reset_results = col_reset.button('🗑️ Borrar Resultados', type="secondary")
+
+st.markdown("---")
+
+# Aplicar el escalado seleccionado
+#df_model_scaled = scale_data(df_model, scaling_method)
