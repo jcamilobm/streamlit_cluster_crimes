@@ -3,7 +3,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
-
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 
 
 # Objetivo:
@@ -79,7 +79,15 @@ def split_identifiers(df_pivot):
     df_model  = df_pivot.drop(columns=columns_to_remove)
     return df_model , df_identifiers
 
-
+# Función para aplicar el escalado seleccionado
+def scale_data(df, method):
+    if method == 'StandardScaler (Z-score)':
+        scaler = StandardScaler()
+    elif method == 'MinMaxScaler (0-1)':
+        scaler = MinMaxScaler()
+    
+    scaled_data = pd.DataFrame(scaler.fit_transform(df), columns=df.columns)
+    return scaled_data
 
 #5) Feature Selection: se hara desde app interactiva
 
