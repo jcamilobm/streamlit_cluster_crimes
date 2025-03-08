@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 from src.EDA.data_manager import load_all_data_and_clean
 from src.components.DatasetFilterSidebar import DatasetFilterSidebar
 from src.models.model_data_preparation import get_model_data, scale_data
@@ -37,25 +38,60 @@ df_crimesf = DatasetFilterSidebar(df_crimes)
 
 df_model , df_identifiers = get_model_data(df_crimesf, df_poblacion , df_geo)
 
-st.dataframe(df_model)
-st.dataframe(df_identifiers)
+with st.expander("Ver Datos completos pivoteados"):
+    df_concatenado = pd.concat([ df_identifiers, df_model], axis=1)
+    st.dataframe(df_concatenado)
 
 
+# Variables del modelo
+st.subheader('Elige las variables del modelo')
+# Opciones para la tasa de crímenes
+opciones_tasa_crimenes = [
+    "Sin tasa",
+    "Crimenes por 1000hab",
+    "Crimenes por 1000hab log"
+]
 
-# Filtro para seleccionar columnas
-columnas_seleccionadas = st.multiselect(
-    'Selecciona las columnas a mostrar', 
-    options=df_model.columns,  # Las opciones son las columnas del DataFrame
-    default=df_model.columns.tolist()  # Predeterminado: mostrar todas las columnas
-)
+# Creamos dos columnas
+col1, col2 = st.columns(2)
 
-df_model  = df_model[columnas_seleccionadas]
-st.dataframe(df_model)
+with col1:
+    seleccion = st.radio("Tasa de crimen:", opciones_tasa_crimenes)
+    # Definición de columnas según la opción elegida
+    if seleccion == "Sin tasa":
+        opciones_crimenes_seleccionada = [
+            'Crimen Organizado', 'Delitos Sexuales', 
+            'Delitos Violentos', 'Robos y Hurtos', 
+            'Violencia Familiar'
+        ]
+    elif seleccion == "Crimenes por 1000hab":
+        opciones_crimenes_seleccionada = [col for col in df_model.columns if 'hab' in col and 'log' not in col]
+    elif seleccion == "Crimenes por 1000hab log":
+        opciones_crimenes_seleccionada = [col for col in df_model.columns if 'log' in col]
+
+    # st.write("Columnas de crímenes seleccionadas:", opciones_crimenes_seleccionada)
+
+with col2:
+    opciones_restantes = ["personas", "area", "manzanas", "poblacional_km2"]
+    opciones_restantes_selecionadas = st.multiselect(
+        'Selecciona otras variables a considerar', 
+        options=opciones_restantes,  
+        default=opciones_restantes[-2:]
+    )
+   # st.write("Columnas restantes seleccionadas:", opciones_restantes_selecionadas)
+
+lista_concatenada = opciones_crimenes_seleccionada + opciones_restantes_selecionadas
+
+
+# filtrar el modelo
+df_model  = df_model[lista_concatenada]
+with st.expander("Ver tabla para el modelo"):
+    st.dataframe(df_model)
 
 
 st.markdown("---")
 # Filtros principales (fuera del sidebar)
-st.header('🔧 Configuración del Modelo')
+st.subheader('🔧 Configuración del Modelo')
 
 # Disposición en columnas para mejor organización visual
 col1, col2, col3 = st.columns(3)
