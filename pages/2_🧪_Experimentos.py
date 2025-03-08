@@ -4,6 +4,7 @@ from src.EDA.data_manager import load_all_data_and_clean
 from src.components.DatasetFilterSidebar import DatasetFilterSidebar
 from src.models.model_data_preparation import get_model_data, scale_data
 from src.models.helper import calculate_clustering_metrics
+from src.models.plots import display_model_metrics_table
 
 from sklearn.cluster import KMeans, AgglomerativeClustering
 
@@ -13,6 +14,18 @@ st.set_page_config(
     layout="centered",
     initial_sidebar_state="expanded"
 )
+
+if 'results' not in st.session_state:
+    st.session_state.results = []
+
+if "deshabilitar_botones" not in st.session_state:
+    st.session_state.deshabilitar_botones = False
+
+def deshabilitar_filtros():
+    st.session_state.deshabilitar_botones = True
+
+def habilitar_filtros():
+    st.session_state.deshabilitar_botones = False
 
 #1. Titulo
 st.markdown("""
@@ -31,7 +44,7 @@ else:
     df_geo = st.session_state.df_geo
 
 # 3. Dibujar side y filtrar datos
-df_crimesf = DatasetFilterSidebar(df_crimes)
+df_crimesf = DatasetFilterSidebar(df_crimes, st.session_state.deshabilitar_botones)
 
 
 # Obtener tabla para los modelos de machine learning
@@ -56,27 +69,26 @@ opciones_tasa_crimenes = [
 col1, col2 = st.columns(2)
 
 with col1:
-    seleccion = st.radio("Tasa de crimen:", opciones_tasa_crimenes)
+    seleccion_tasa = st.radio("Tasa de crimen:", opciones_tasa_crimenes, disabled=st.session_state.deshabilitar_botones)
     # Definición de columnas según la opción elegida
-    if seleccion == "Sin tasa":
+    if seleccion_tasa == "Sin tasa":
         opciones_crimenes_seleccionada = [
             'Crimen Organizado', 'Delitos Sexuales', 
             'Delitos Violentos', 'Robos y Hurtos', 
             'Violencia Familiar'
         ]
-    elif seleccion == "Crimenes por 1000hab":
+    elif seleccion_tasa  == "Crimenes por 1000hab":
         opciones_crimenes_seleccionada = [col for col in df_model.columns if 'hab' in col and 'log' not in col]
-    elif seleccion == "Crimenes por 1000hab log":
+    elif seleccion_tasa == "Crimenes por 1000hab log":
         opciones_crimenes_seleccionada = [col for col in df_model.columns if 'log' in col]
-
-    # st.write("Columnas de crímenes seleccionadas:", opciones_crimenes_seleccionada)
 
 with col2:
     opciones_restantes = ["personas", "area", "manzanas", "poblacional_km2"]
     opciones_restantes_selecionadas = st.multiselect(
         'Selecciona otras variables a considerar', 
         options=opciones_restantes,  
-        default=opciones_restantes[-2:]
+        default=opciones_restantes[-2:],
+        disabled=st.session_state.deshabilitar_botones
     )
    # st.write("Columnas restantes seleccionadas:", opciones_restantes_selecionadas)
 
@@ -85,9 +97,6 @@ lista_concatenada = opciones_crimenes_seleccionada + opciones_restantes_selecion
 
 # filtrar el modelo
 df_model  = df_model[lista_concatenada]
-with st.expander("Ver tabla para el modelo"):
-    st.dataframe(df_model)
-
 
 st.markdown("---")
 # Filtros principales (fuera del sidebar)
@@ -111,24 +120,50 @@ with col3:
                                   ['StandardScaler (Z-score)', 'MinMaxScaler (0-1)', 'RobustScaler'],
                                   help="StandardScaler: media 0, varianza 1. MinMaxScaler: 0 a 1, afectado por outliers. RobustScaler: usa mediana, resistente a outliers.")
      
-
-# Botones para ejecutar el modelo y borrar resultados
-col_run, col_reset = st.columns(2)
-run_model = col_run.button('🚀 Ejecutar Modelo', type="primary")
-reset_results = col_reset.button('🗑️ Borrar Resultados', type="secondary")
-
-st.markdown("---")
-
-
-
 # Aplicar el escalado seleccionado
 df_model_scaled = scale_data(df_model, scaling_method)
+with st.expander("Ver tabla para el modelo escalada"):
+    st.dataframe(df_model_scaled)
+
+col_run, col_reset = st.columns(2)
+run_model = col_run.button('🚀 Ejecutar Modelo', type="primary", on_click=deshabilitar_filtros)
+reset_results = col_reset.button('🗑️ Borrar Resultados', type="secondary", on_click=habilitar_filtros)
+st.markdown("---")
 
 if run_model:
     if model_type == 'K-means':
-        model = KMeans(n_clusters=n_clusters, random_state=42)
+        model = KMeans(n_clusters = n_clusters, random_state=42)
     else:
-        model = AgglomerativeClustering(n_clusters=n_clusters)
+        model = AgglomerativeClustering(n_clusters = n_clusters)
 
     labels = model.fit_predict(df_model_scaled)
     metrics = calculate_clustering_metrics(df_model_scaled, labels, model if model_type == 'K-means' else None)
+
+        # Guardar resultados dinámicamente
+    st.session_state.results.append({
+        'Modelo': model_type,
+        'Clusters': n_clusters,
+        'Escalado': scaling_method,
+        'Modelo Entrenado': model,  # Aquí guardamos el modelo completo
+        'Labels':labels ,
+        **metrics
+    })
+
+# Borrar resultados
+if reset_results:
+    st.session_state.results = []
+
+if st.session_state.results:
+    st.subheader('📊 Resultados Comparativos')
+
+    results_df = pd.DataFrame(st.session_state.results)
+    results_df['Inercia'] = pd.to_numeric(results_df['Inercia'], errors='coerce')
+    results_df.drop(columns=["Modelo Entrenado", "Labels"],inplace=True)
+
+    response = display_model_metrics_table(results_df)
+    selected_rows = response.selected_rows
+   # validar si devuelve un dataframe para evitar error
+    if isinstance(selected_rows, pd.DataFrame):
+        #st.write(selected_rows)
+        # st.write(selected_rows.index)
+        posFilaSeleccionada = int(selected_rows.index[0])

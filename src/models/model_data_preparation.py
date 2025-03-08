@@ -2,8 +2,7 @@ import streamlit as st
 
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import StandardScaler
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler
 
 
 # Objetivo:
@@ -85,6 +84,8 @@ def scale_data(df, method):
         scaler = StandardScaler()
     elif method == 'MinMaxScaler (0-1)':
         scaler = MinMaxScaler()
+    elif method == 'RobustScaler':
+        scaler = RobustScaler()
     
     scaled_data = pd.DataFrame(scaler.fit_transform(df), columns=df.columns)
     return scaled_data

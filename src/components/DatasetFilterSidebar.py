@@ -15,7 +15,7 @@ def multiselect_filter(label, df, column):
     opciones = df[column].dropna().unique().tolist()
     return st.multiselect(label, options=opciones, default=opciones)
 
-def DatasetFilterSidebar(df):
+def DatasetFilterSidebar(df, filtro_habilitado=True):
     """Componente de filtro de datos para múltiples páginas en Streamlit."""
     st.sidebar.header(' 🌪️ Filtrar datos')
 
@@ -40,7 +40,8 @@ def DatasetFilterSidebar(df):
 
         #  Aplicar filtros
         filtros_llenos = all([sexo, movil_victima, curso_vida, momento_del_dia, tipo_amenaza])
-        submit = st.form_submit_button('✅ Aplicar filtros', on_click = on_change_filter_data)
+        submit = st.form_submit_button('✅ Aplicar filtros', on_click = on_change_filter_data,
+                                       disabled = filtro_habilitado)
 
     #  Mensaje si los filtros están vacíos
     if not filtros_llenos:
