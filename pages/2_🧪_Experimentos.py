@@ -3,8 +3,8 @@ import pandas as pd
 from src.EDA.data_manager import load_all_data_and_clean
 from src.components.DatasetFilterSidebar import DatasetFilterSidebar
 from src.models.model_data_preparation import get_model_data, scale_data
-from src.models.helper import calculate_clustering_metrics
-from src.models.plots import display_model_metrics_table
+from src.models.helper import calculate_clustering_metrics, calculate_score_normalizado
+from src.models.plots import show_model_metrics_table,show_teory_metrics_clustering
 
 from sklearn.cluster import KMeans, AgglomerativeClustering
 
@@ -160,10 +160,20 @@ if st.session_state.results:
     results_df['Inercia'] = pd.to_numeric(results_df['Inercia'], errors='coerce')
     results_df.drop(columns=["Modelo Entrenado", "Labels"],inplace=True)
 
-    response = display_model_metrics_table(results_df)
+    # Calcular el score global con normalización ponderada
+    df_norm = calculate_score_normalizado(results_df)
+    #st.write(df_norm)
+    # Ordenar la tabla de mayor a menor según el score global
+    results_df_ordenado = df_norm.sort_values(by='score_global', ascending=False)
+
+    response = show_model_metrics_table(results_df_ordenado)
     selected_rows = response.selected_rows
+
    # validar si devuelve un dataframe para evitar error
     if isinstance(selected_rows, pd.DataFrame):
         #st.write(selected_rows)
         # st.write(selected_rows.index)
         posFilaSeleccionada = int(selected_rows.index[0])
+
+# Mostrar infromacion teorica de como interpretar las emtricas encontradas
+show_teory_metrics_clustering()
