@@ -1,14 +1,14 @@
-from st_aggrid import AgGrid, GridOptionsBuilder
-
 import streamlit as st
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-
-import streamlit as st
-import pandas as pd
 from st_aggrid import AgGrid, GridOptionsBuilder
+
+import folium
+from folium import Figure
+from folium.plugins import Fullscreen
+from streamlit_folium import st_folium
 
 def show_model_metrics_table(df, title='📊 Comparación de métricas'):
     """
@@ -225,3 +225,62 @@ def show_teory_metrics_clustering():
           **0 es el valor óptimo** (clusters completamente separados).  
           **Valores más altos** sugieren que los clusters están solapados.
         """)
+
+
+
+def plot_clusters_map(df_pivot_clusters_and_geo, geojson_data):
+    # Crear el mapa centrado en Bucaramanga
+    fig = Figure(width=360, height=400)
+    mapa = folium.Map(location=[7.1254, -73.1198],
+                      zoom_start=12,
+                      tiles="CartoDB positron",
+                      attr="Map tiles by CartoDB")
+    fig.add_child(mapa)
+
+    # Paleta de colores para clusters
+    palette = {
+        0: "#1f77b4", 1: "#ff7f0e", 2: "#2ca02c", 3: "#d62728", 4: "#9467bd",
+        5: "#8c564b", 6: "#e377c2", 7: "#7f7f7f", 8: "#bcbd22", 9: "#17becf"
+    }
+
+    # Función para colorear las comunas según su cluster
+    def style_function(feature):
+        cluster = feature["properties"].get("cluster")
+        return {"fillColor": palette.get(cluster, "gray"), "color": "black", "weight": 1, "fillOpacity": 0.6}
+
+    # Añadir tooltip con info de cada comuna
+    tooltip = folium.GeoJsonTooltip(fields=["nombre_com", "cluster"], aliases=["Comuna:", "Cluster:"])
+
+    # Añadir las comunas al mapa
+    folium.GeoJson(
+        geojson_data,
+        name="Comunas de Bucaramanga",
+        style_function=style_function,
+        tooltip=tooltip
+    ).add_to(mapa)
+
+    # Añadir botón de pantalla completa
+    Fullscreen(position="topright").add_to(mapa)
+
+    # Dividir en dos columnas (70% mapa, 30% leyenda)
+    col1, col2 = st.columns([0.7, 0.3])
+
+    with col1:
+        st_folium(mapa, width=700, height=500)
+
+    with col2:
+        # Obtener clusters únicos para la leyenda
+        clusters = sorted(df_pivot_clusters_and_geo["cluster"].unique())
+
+        # Crear tarjetas alineadas con el mapa
+        for cluster in clusters:
+            color = palette.get(cluster, "gray")
+            st.markdown(
+                f"""
+                <div style='display: flex; align-items: center; margin-bottom: 10px;'>
+                    <div style='width: 20px; height: 20px; background-color: {color}; margin-right: 10px;'></div>
+                    <span>Cluster {cluster}</span>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )

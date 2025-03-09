@@ -3,7 +3,7 @@ import pandas as pd
 from src.EDA.data_manager import load_all_data_and_clean
 from src.components.DatasetFilterSidebar import DatasetFilterSidebar
 from src.models.model_data_preparation import get_model_data, scale_data
-from src.models.helper import calculate_clustering_metrics, calculate_score_normalizado
+from src.models.helper import *
 #from src.models.plots import show_model_metrics_table,show_teory_metrics_clustering, show_labels_frequency_table
 from src.models.plots import *
 from sklearn.cluster import KMeans, AgglomerativeClustering
@@ -196,3 +196,7 @@ if posFilaSeleccionada != "Sin seleccion de fila" :
         plot_heatmap_clusters_kmeans(df_model,model)
     else:
         plot_dendrogram_jerarquico(df_model, n_clusters)
+
+    # preparar datos para mapa
+    df_pivot_with_clusters, geojson_data = prepare_geojson_with_clusters(df_identifiers, df_model, labels, df_geo)
+    plot_clusters_map(df_pivot_with_clusters , geojson_data)
