@@ -177,6 +177,7 @@ if run_model:
         'Modelo': model_type,
         'Clusters': n_clusters,
         'Escalado': scaling_method,
+        'distance_metric':distance_metric,
         'Modelo Entrenado': model,  # Aquí guardamos el modelo completo
         'Labels':labels ,
         **metrics
@@ -215,12 +216,17 @@ if posFilaSeleccionada != "Sin seleccion de fila" :
        
     modelo = st.session_state.results[posFilaSeleccionada]['Modelo']
     model = st.session_state.results[posFilaSeleccionada]['Modelo Entrenado']
+    escala = st.session_state.results[posFilaSeleccionada]['Escalado']
+    distancia = st.session_state.results[posFilaSeleccionada]['distance_metric']
+
     n_clusters = st.session_state.results[posFilaSeleccionada]['Clusters']
     labels = st.session_state.results[posFilaSeleccionada]['Labels']
     st.markdown(f"""
     ### Modelo Seleccionado
     - **Modelo:** {modelo}  
     - **Número de Clusters:** {n_clusters}
+    - **Escala:** {escala}  
+    - **Metodo de Distancia:** {distancia}
     """)
 
     show_labels_frequency_table(labels)
