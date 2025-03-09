@@ -32,10 +32,11 @@ def calculate_score_normalizado(df):
     - Métricas donde menor es mejor: 'Davies-Bouldin'
 
     Si alguna métrica es None o NaN, se rellena con la mediana o 0.5 si no hay datos.
+    El score global se redondea a 4 decimales.
     """
     df_norm = df.copy()
     
-    # Actualizamos el diccionario de pesos sin incluir Inercia
+    # Diccionario de pesos (sin incluir Inercia)
     pesos = {
         'Silhouette Score': 0.5,
         'Calinski-Harabasz': 0.3,
@@ -77,9 +78,12 @@ def calculate_score_normalizado(df):
             df_norm[metrica + '_norm'] = 0.5
 
     # Calcular el score global combinando las métricas normalizadas
-    df_norm['score_global'] = (
+    df_norm['score'] = (
         pesos['Silhouette Score'] * df_norm['Silhouette Score_norm'] +
         pesos['Calinski-Harabasz'] * df_norm['Calinski-Harabasz_norm'] +
         pesos['Davies-Bouldin'] * df_norm['Davies-Bouldin_norm']
     )
+    # Redondear el score a 4 decimales
+    df_norm['score'] = df_norm['score'].round(3)
+    
     return df_norm

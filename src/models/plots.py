@@ -5,21 +5,28 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+
+import streamlit as st
+import pandas as pd
+from st_aggrid import AgGrid, GridOptionsBuilder
+
 def show_model_metrics_table(df, title='📊 Comparación de métricas'):
     """
     Renderiza una tabla interactiva con selección de fila única usando AgGrid,
-    considerando solo las columnas ['Modelo', 'Clusters', 'Inercia', 'Silhouette Score', 
-    'Calinski-Harabasz', 'Davies-Bouldin'] y eliminando duplicados.
-
+    considerando las columnas ['Modelo', 'Clusters', 'Inercia', 'Silhouette Score',
+    'Calinski-Harabasz', 'Davies-Bouldin', 'score_global'] y eliminando duplicados.
+    
+    Se renombra la columna 'score_global' a 'Score' para mostrarla en la tabla.
+    
     Parámetros:
-    - df (pd.DataFrame): DataFrame con las métricas de los modelos.
-    - title (str): Título de la tabla.
-
+      - df (pd.DataFrame): DataFrame con las métricas de los modelos, que debe incluir la columna 'score_global'.
+      - title (str): Título de la tabla.
+    
     Retorna:
-    - list: Datos de la fila seleccionada (si existe).
+      - dict: Datos de la fila seleccionada (si existe).
     """
-    # Seleccionar solo las columnas de interés
-    columnas = ['Modelo', 'Clusters', 'Inercia', 'Silhouette Score', 'Calinski-Harabasz', 'Davies-Bouldin']
+    # Seleccionar las columnas de interés, incluyendo 'score_global'
+    columnas = ['score','Modelo', 'Clusters', 'Inercia', 'Silhouette Score', 'Calinski-Harabasz', 'Davies-Bouldin']
     df_subset = df[columnas].copy()
     
     # Eliminar duplicados basados en las columnas seleccionadas
@@ -36,6 +43,9 @@ def show_model_metrics_table(df, title='📊 Comparación de métricas'):
         autoHeaderHeight=True
     )
     
+    # Renombrar la columna 'score_global' a 'Score' en la vista
+   # gb.configure_column('score_global', headerName='Score')
+    
     # Centrar columnas numéricas, exceptuando la columna 'Modelo'
     for col in columnas:
         if col != 'Modelo' and col in df_clean.columns:
@@ -51,9 +61,7 @@ def show_model_metrics_table(df, title='📊 Comparación de métricas'):
     row_count = max(1, df_clean.shape[0])
     row_height = 60
     min_height = 140
-    max_height = 300 # Altura máxima para evitar espacio en blanco excesivo
-    
-    # Calcula la altura según el número de filas, pero sin exceder el máximo
+    max_height = 300  # Altura máxima para evitar espacio en blanco excesivo
     calculated_height = min(max_height, max(min_height, row_count * row_height))
     
     # Renderizar la tabla
@@ -67,7 +75,6 @@ def show_model_metrics_table(df, title='📊 Comparación de métricas'):
     )
     
     return response
-
 
 
 

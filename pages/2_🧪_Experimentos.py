@@ -153,6 +153,8 @@ if run_model:
 if reset_results:
     st.session_state.results = []
 
+
+posFilaSeleccionada = "Sin seleccion de fila"
 if st.session_state.results:
     st.subheader('📊 Resultados Comparativos')
 
@@ -162,18 +164,28 @@ if st.session_state.results:
 
     # Calcular el score global con normalización ponderada
     df_norm = calculate_score_normalizado(results_df)
-    #st.write(df_norm)
-    # Ordenar la tabla de mayor a menor según el score global
-    results_df_ordenado = df_norm.sort_values(by='score_global', ascending=False)
-
-    response = show_model_metrics_table(results_df_ordenado)
+ 
+    response = show_model_metrics_table(df_norm)
+    #response = show_table_with_preselected_row(df_norm, preselect_index=0)
     selected_rows = response.selected_rows
 
    # validar si devuelve un dataframe para evitar error
     if isinstance(selected_rows, pd.DataFrame):
-        #st.write(selected_rows)
-        # st.write(selected_rows.index)
         posFilaSeleccionada = int(selected_rows.index[0])
-
-# Mostrar infromacion teorica de como interpretar las emtricas encontradas
+        st.write(posFilaSeleccionada)
+# Mostrar informacion teorica de como interpretar las emtricas encontradas
 show_teory_metrics_clustering()
+
+
+# Input numérico básico
+if posFilaSeleccionada != "Sin seleccion de fila" :
+       
+    modelo = st.session_state.results[posFilaSeleccionada]['Modelo']
+    model = st.session_state.results[posFilaSeleccionada]['Modelo Entrenado']
+    n_clusters = st.session_state.results[posFilaSeleccionada]['Clusters']
+    labels = st.session_state.results[posFilaSeleccionada]['Labels']
+    st.markdown(f"""
+    ### 🤖 Modelo Seleccionado
+    - **Modelo:** {modelo}  
+    - **Número de Clusters:** {n_clusters}
+    """)
