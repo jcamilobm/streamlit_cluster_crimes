@@ -4,6 +4,37 @@ import geopandas as gpd
 from sklearn.metrics import silhouette_score, calinski_harabasz_score, davies_bouldin_score
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 
+from sklearn.cluster import KMeans, AgglomerativeClustering
+
+def get_clustering_model(model_type, n_clusters, distance_metric):
+    """
+    Devuelve una instancia del modelo de clustering según la selección del usuario.
+
+    Parámetros:
+    - model_type (str): 'K-means' o 'Clustering Jerárquico'.
+    - n_clusters (int): Número de clusters.
+    - distance_metric (str): Métrica de distancia seleccionada por el usuario.
+
+    Retorna:
+    - Instancia del modelo seleccionado (KMeans o AgglomerativeClustering).
+    """
+    if model_type == 'K-means':
+        return KMeans(n_clusters=n_clusters, random_state=42)
+
+    else:  # Clustering Jerárquico
+        metric_method = distance_metric.lower()
+
+        # Configurar el linkage adecuado
+        if metric_method == "euclidean":
+            linkage_method = "ward"  # Ward solo funciona con Euclidean
+        else:
+            linkage_method = "average"  # Permite Manhattan, Cosine, Correlation
+
+        # Retornar el modelo
+        return AgglomerativeClustering(n_clusters=n_clusters, 
+                                       metric=metric_method, 
+                                       linkage=linkage_method)
+
 
 # Función para calcular las métricas de clustering
 def calculate_clustering_metrics(df_model, labels, model=None):
@@ -31,7 +62,7 @@ def calculate_score_normalizado(df):
     - Métricas donde menor es mejor: 'Davies-Bouldin'
 
     Si alguna métrica es None o NaN, se rellena con la mediana o 0.5 si no hay datos.
-    El score global se redondea a 4 decimales.
+    El score global se redondea a 3 decimales.
     """
     df_norm = df.copy()
     

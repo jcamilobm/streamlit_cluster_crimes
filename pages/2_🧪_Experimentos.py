@@ -119,22 +119,39 @@ st.markdown("---")
 st.subheader('🔧 Configuración del Modelo')
 
 # Disposición en columnas para mejor organización visual
-col1, col2, col3 = st.columns(3)
+col1, col2, col3, col4 = st.columns([2, 1.5, 2, 1.5])  # Ajuste del ancho de las columnas
 
 with col1:
-    model_type = st.selectbox('Seleccionar modelo:', ['K-means', 'Clustering Jerárquico'],
+    model_type = st.selectbox('Seleccionar modelo:', 
+                              ['K-means', 'Clustering Jerárquico'],
                               help="Modelo para agrupar comunas similares.")
 
 with col2:
-    #n_clusters = st.slider('Número de Clusters:', 2, 10, 3)
-    # Selección del número de clusters con un widget interactivo (+ y -)
-    n_clusters = st.number_input('Número de Clusters:', min_value=2, max_value=6, value=3, step=1,help="Número de grupos de comunas")
-
+    n_clusters = st.number_input('Clusters:', 
+                                 min_value=2, max_value=6, 
+                                 value=3, step=1,
+                                 help="Número de grupos de comunas.")
 
 with col3:
     scaling_method = st.selectbox('Método de escalado:', 
-                                  ['StandardScaler (Z-score)', 'MinMaxScaler (0-1)', 'RobustScaler'],
+                                  ['StandardScaler (Z-score)', 
+                                   'MinMaxScaler (0-1)', 
+                                   'RobustScaler'],
                                   help="StandardScaler: media 0, varianza 1. MinMaxScaler: 0 a 1, afectado por outliers. RobustScaler: usa mediana, resistente a outliers.")
+
+with col4:
+    # Opciones de distancia según el modelo seleccionado
+    distance_options = ['Euclidean']  # K-Means solo usa Euclidean
+    if model_type == 'Clustering Jerárquico':
+        distance_options.extend(['Manhattan', 'Cosine', 'Correlation'])  # Opciones adicionales para clustering jerárquico
+
+    distance_metric = st.selectbox('Métrica de distancia:', 
+                                   distance_options,
+                                   help="Euclidean: estándar en clustering. Manhattan: robusto ante outliers. Cosine: para direccionalidad. Correlation: útil si hay relaciones entre crímenes.")
+
+
+
+
      
 # Aplicar el escalado seleccionado
 df_model_scaled = scale_data(df_model, scaling_method)
@@ -149,10 +166,8 @@ reset_results = col_reset.button('🗑️ Borrar Resultados', type="secondary", 
 st.markdown("---")
 
 if run_model:
-    if model_type == 'K-means':
-        model = KMeans(n_clusters = n_clusters, random_state=42)
-    else:
-        model = AgglomerativeClustering(n_clusters = n_clusters)
+    model = get_clustering_model(model_type, n_clusters, distance_metric) 
+
 
     labels = model.fit_predict(df_model_scaled)
     metrics = calculate_clustering_metrics(df_model_scaled, labels, model if model_type == 'K-means' else None)
