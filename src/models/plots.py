@@ -174,6 +174,31 @@ def plot_dendrogram_jerarquico(data, num_clusters, method='ward', metric='euclid
 
 
 
+
+def plot_heatmap(df, title='Heatmap de Correlación'):
+    """
+    Calcula la matriz de correlación de un DataFrame y muestra un heatmap en Streamlit.
+    
+    Parámetros:
+      - df (pd.DataFrame): DataFrame de entrada.
+      - title (str): Título del gráfico.
+      
+    Retorna:
+      - None. Muestra el heatmap en la aplicación Streamlit.
+    """
+    # Calcular la matriz de correlación
+    corr_matrix = df.corr()
+    
+    # Crear la figura y el eje para el heatmap
+    fig, ax = plt.subplots(figsize=(10, 8))
+    
+    # Graficar el heatmap con anotaciones y un mapa de colores adecuado
+    sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', ax=ax)
+    
+    # Asignar título y mostrar el gráfico
+    ax.set_title(title)
+    st.pyplot(fig)
+    
 def show_teory_metrics_clustering():
     col1, col2 = st.columns(2)
     with col1:

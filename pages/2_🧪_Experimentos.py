@@ -94,9 +94,12 @@ with col2:
 
 lista_concatenada = opciones_crimenes_seleccionada + opciones_restantes_selecionadas
 
-
 # filtrar el modelo
 df_model  = df_model[lista_concatenada]
+
+df_model_scaled = scale_data(df_model, 'RobustScaler')
+plot_heatmap(df_model_scaled)
+
 
 st.markdown("---")
 # Filtros principales (fuera del sidebar)
@@ -122,6 +125,8 @@ with col3:
      
 # Aplicar el escalado seleccionado
 df_model_scaled = scale_data(df_model, scaling_method)
+
+
 with st.expander("Ver tabla para el modelo escalada"):
     st.dataframe(df_model_scaled)
 
