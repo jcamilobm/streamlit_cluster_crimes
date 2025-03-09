@@ -80,14 +80,31 @@ def split_identifiers(df_pivot):
 
 # Función para aplicar el escalado seleccionado
 def scale_data(df, method):
-    if method == 'StandardScaler (Z-score)':
-        scaler = StandardScaler()
-    elif method == 'MinMaxScaler (0-1)':
-        scaler = MinMaxScaler()
-    elif method == 'RobustScaler':
-        scaler = RobustScaler()
+    """
+    Escala un DataFrame según el método especificado.
     
-    scaled_data = pd.DataFrame(scaler.fit_transform(df), columns=df.columns)
+    Parámetros:
+    - df (pd.DataFrame): Datos a escalar.
+    - method (str): Método de escalado ('StandardScaler (Z-score)', 'MinMaxScaler (0-1)', 'RobustScaler').
+
+    Retorna:
+    - pd.DataFrame: DataFrame escalado con las mismas columnas e índice original.
+    """
+
+    scalers = {
+        'StandardScaler (Z-score)': StandardScaler(),
+        'MinMaxScaler (0-1)': MinMaxScaler(),
+        'RobustScaler': RobustScaler()
+    }
+
+    if method not in scalers:
+        raise ValueError(f"❌ Método de escalado '{method}' no reconocido. Usa: {list(scalers.keys())}")
+
+    scaler = scalers[method]
+    
+    # Escalar datos manteniendo el índice y columnas originales
+    scaled_data = pd.DataFrame(scaler.fit_transform(df), columns=df.columns, index=df.index)
+    
     return scaled_data
 
 #5) Feature Selection: se hara desde app interactiva

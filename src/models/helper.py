@@ -1,8 +1,12 @@
 import streamlit as st
 import pandas as pd
 import geopandas as gpd
-from sklearn.metrics import silhouette_score, calinski_harabasz_score, davies_bouldin_score
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
+
+
+import itertools
+from sklearn.cluster import KMeans, AgglomerativeClustering
+from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler
+from sklearn.metrics import silhouette_score, davies_bouldin_score, calinski_harabasz_score
 
 from sklearn.cluster import KMeans, AgglomerativeClustering
 
@@ -161,3 +165,143 @@ def prepare_geojson_with_clusters(df_identifiers, df_model, labels, gdf):
     
     return df_pivot_with_clusters, geojson_data
 
+
+
+def scale_data(df, method):
+    """
+    Escala un DataFrame según el método especificado.
+    
+    Parámetros:
+    - df (pd.DataFrame): Datos a escalar.
+    - method (str): Método de escalado ('StandardScaler (Z-score)', 'MinMaxScaler (0-1)', 'RobustScaler').
+
+    Retorna:
+    - pd.DataFrame: DataFrame escalado con las mismas columnas e índice original.
+    """
+
+    scalers = {
+        'StandardScaler (Z-score)': StandardScaler(),
+        'MinMaxScaler (0-1)': MinMaxScaler(),
+        'RobustScaler': RobustScaler()
+    }
+
+    if method not in scalers:
+        raise ValueError(f"❌ Método de escalado '{method}' no reconocido. Usa: {list(scalers.keys())}")
+
+    scaler = scalers[method]
+    
+    # Escalar datos manteniendo el índice y columnas originales
+    scaled_data = pd.DataFrame(scaler.fit_transform(df), columns=df.columns, index=df.index)
+    
+    return scaled_data
+
+def run_manual_experiment(df_model, model_type, n_clusters, distance_metric, scaling_method):
+    """
+    Ejecuta un experimento manual de clustering y guarda los resultados en `st.session_state.results`.
+    
+    Parámetros:
+    - df_model (pd.DataFrame): Datos a clusterizar.
+    - model_type (str): Tipo de modelo ('K-means' o 'Clustering Jerárquico').
+    - n_clusters (int): Número de clusters.
+    - distance_metric (str): Métrica de distancia.
+    - scaling_method (str): Método de escalado ('StandardScaler', 'MinMaxScaler', 'RobustScaler').
+    """
+    
+    # Obtener el modelo según el tipo seleccionado
+    model = get_clustering_model(model_type, n_clusters, distance_metric)
+    
+    # Escalar los datos
+    df_model_scaled =  scale_data(df_model, scaling_method)
+
+    # Ejecutar clustering
+    labels = model.fit_predict(df_model_scaled)
+
+    # Calcular métricas (si es K-means, se pasa el modelo para calcular inercia)
+    metrics = calculate_clustering_metrics(df_model_scaled, labels, model if model_type == 'K-means' else None)
+
+    # Guardar resultados en `st.session_state`
+    st.session_state.results.append({
+        'Modelo': model_type,
+        'Clusters': n_clusters,
+        'Escalado': scaling_method,
+        'distance_metric': distance_metric,
+        'Modelo Entrenado': model,  # Guarda el modelo completo
+        'Labels': labels,  # Etiquetas de clusterización
+        **metrics  # Agregar métricas de evaluación dinámicamente
+    })
+    
+    st.success("✅ Se ejecutó el clustering manual y se guardó en `st.session_state.results`")
+
+
+
+def run_all_experiments(X_df):
+    """Ejecuta todas las combinaciones de clustering y almacena los resultados en st.session_state['results'].
+
+    Parámetros:
+    - X_df: pd.DataFrame -> Datos reales del usuario en formato DataFrame (sin escalar).
+    """
+
+    # Convertir DataFrame a array de numpy
+    X = X_df.to_numpy()
+
+    # Definir los valores posibles de cada parámetro
+    model_types = ["K-means", "Clustering Jerárquico"]
+    n_clusters_options = list(range(3, 6))  # De 2 a 6 clusters
+    scaling_methods = ["StandardScaler", "MinMaxScaler", "RobustScaler"]
+    distance_metrics = ["Euclidean", "Manhattan", "Cosine", "Correlation"]
+
+    # Inicializar `st.session_state.results` si no existe
+    if "results" not in st.session_state:
+        st.session_state.results = []
+
+    # Recorrer primero un modelo y luego el otro
+    for model_type in model_types:
+        # Ajustar métricas de distancia según el modelo seleccionado
+        metrics_to_use = ["Euclidean"] if model_type == "K-means" else distance_metrics
+
+        # Generar todas las combinaciones de parámetros
+        for n_clusters, scaling_method, distance_metric in itertools.product(n_clusters_options, scaling_methods, metrics_to_use):
+            # Aplicar escalado
+            scaler = {
+                "StandardScaler": StandardScaler(),
+                "MinMaxScaler": MinMaxScaler(),
+                "RobustScaler": RobustScaler()
+            }[scaling_method]
+            
+            X_scaled = scaler.fit_transform(X)  # Escalar los datos reales
+
+            # Configurar y ejecutar el modelo
+            if model_type == "K-means":
+                model = KMeans(n_clusters=n_clusters, random_state=42)
+                model.fit(X_scaled)  # Ajustar modelo para obtener `inertia_`
+                inertia = model.inertia_
+                labels = model.predict(X_scaled)
+            else:
+                linkage_method = "ward" if distance_metric == "Euclidean" else "average"
+                model = AgglomerativeClustering(n_clusters=n_clusters, metric=distance_metric.lower(), linkage=linkage_method)
+                labels = model.fit_predict(X_scaled)
+                inertia = None  # AgglomerativeClustering no tiene `inertia_`
+
+            # Calcular métricas de evaluación
+            metrics = {
+                "Silhouette Score": silhouette_score(X_scaled, labels),
+                "Davies-Bouldin": davies_bouldin_score(X_scaled, labels),
+                "Calinski-Harabasz": calinski_harabasz_score(X_scaled, labels)
+            }
+
+            # Agregar Inercia solo si el modelo es K-Means
+            if inertia is not None:
+                metrics["Inercia"] = inertia
+
+            # Guardar resultados en el formato correcto
+            st.session_state.results.append({
+                "Modelo": model_type,
+                "Clusters": n_clusters,
+                "Escalado": scaling_method,
+                "distance_metric": distance_metric,
+                "Modelo Entrenado": model,  # Guardamos el modelo completo
+                "Labels": labels,  # Etiquetas del clustering
+                **metrics  # Se expanden las métricas dentro del diccionario
+            })
+
+    st.success("✅ Se ejecutaron todas las combinaciones y los resultados están guardados en session_state['results']")

@@ -151,37 +151,23 @@ with col4:
 
 
 
-
-     
 # Aplicar el escalado seleccionado
-df_model_scaled = scale_data(df_model, scaling_method)
-
+#df_model_scaled = scale_data(df_model, scaling_method)
 
 with st.expander("Ver tabla para el modelo escalada"):
     st.dataframe(df_model_scaled)
 
 col_run, col_reset = st.columns(2)
 run_model = col_run.button('🚀 Ejecutar Modelo', type="primary", on_click=deshabilitar_filtros)
+run_many_experiments = col_run.button('🚀 Ejecutar varias pruebas', type="primary", on_click=deshabilitar_filtros)
 reset_results = col_reset.button('🗑️ Borrar Resultados', type="secondary", on_click=habilitar_filtros)
 st.markdown("---")
 
 if run_model:
-    model = get_clustering_model(model_type, n_clusters, distance_metric) 
+    run_manual_experiment(df_model, model_type, n_clusters, distance_metric, scaling_method)
 
-
-    labels = model.fit_predict(df_model_scaled)
-    metrics = calculate_clustering_metrics(df_model_scaled, labels, model if model_type == 'K-means' else None)
-
-        # Guardar resultados dinámicamente
-    st.session_state.results.append({
-        'Modelo': model_type,
-        'Clusters': n_clusters,
-        'Escalado': scaling_method,
-        'distance_metric':distance_metric,
-        'Modelo Entrenado': model,  # Aquí guardamos el modelo completo
-        'Labels':labels ,
-        **metrics
-    })
+if run_many_experiments:
+    run_all_experiments(df_model)  # Pasa el DataFrame aquí sin escalar.
 
 # Borrar resultados
 if reset_results:
@@ -189,6 +175,7 @@ if reset_results:
 
 
 posFilaSeleccionada = "Sin seleccion de fila"
+
 if st.session_state.results:
     st.subheader('📊 Resultados Comparativos')
 
@@ -207,6 +194,7 @@ if st.session_state.results:
     if isinstance(selected_rows, pd.DataFrame):
         posFilaSeleccionada = int(selected_rows.index[0])
         st.write(posFilaSeleccionada)
+        
 # Mostrar informacion teorica de como interpretar las emtricas encontradas
 show_teory_metrics_clustering()
 
