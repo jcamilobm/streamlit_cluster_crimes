@@ -198,6 +198,7 @@ def plot_heatmap(df, title='Heatmap de Correlación'):
     # Asignar título y mostrar el gráfico
     ax.set_title(title)
     st.pyplot(fig)
+
     
 def show_teory_metrics_clustering():
     col1, col2 = st.columns(2)

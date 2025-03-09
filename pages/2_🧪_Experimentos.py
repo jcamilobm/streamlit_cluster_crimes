@@ -26,6 +26,7 @@ def deshabilitar_filtros():
 
 def habilitar_filtros():
     st.session_state.deshabilitar_botones = False
+    st.session_state.results = []
 
 #1. Titulo
 st.markdown("""
@@ -57,7 +58,19 @@ with st.expander("Ver Datos completos pivoteados"):
 
 
 # Variables del modelo
-st.subheader('Elige las variables del modelo')
+# Variables del modelo
+col1, col2 = st.columns([4, 1])
+
+with col1:
+    st.subheader('Elige las variables del modelo')
+
+with col2:
+  st.button('🔄 Reiniciar', key='reset_test', type="secondary", on_click=habilitar_filtros)
+ 
+
+
+
+
 # Opciones para la tasa de crímenes
 opciones_tasa_crimenes = [
     "Sin tasa",
