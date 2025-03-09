@@ -108,6 +108,72 @@ def show_labels_frequency_table(labels):
 
 
 
+def plot_heatmap_clusters_kmeans(  data , model_kmeans):
+  # Graficar un mapa de calor para interpretar los centros de los clusters del algortimo KMEANS
+  centroids_df = pd.DataFrame(model_kmeans.cluster_centers_, columns = data.columns)
+  plt.figure(figsize=(10, 2))
+  sns.heatmap(centroids_df , cmap='RdBu', annot=True , fmt=".2f", linewidths=.5)
+      # Mostrar el gráfico en Streamlit
+  st.pyplot(plt)
+
+    # Cerrar la figura para evitar que se acumulen
+  plt.clf()
+
+
+
+
+
+from scipy.cluster.hierarchy import dendrogram, linkage, fcluster
+import numpy as np
+
+def plot_dendrogram_jerarquico(data, num_clusters, method='ward', metric='euclidean', title='Dendrograma'):
+    """
+    Genera y muestra un dendrograma coloreado para datos utilizando agrupamiento jerárquico.
+    Se dibuja una línea horizontal que indica el corte que produce el número deseado de clusters.
+    Las ramas se colorean de acuerdo al umbral (cutoff) y, por tanto, al número de clusters.
+    
+    Parámetros:
+      - data (array-like o DataFrame): Datos para el clustering.
+      - num_clusters (int): Número deseado de clusters.
+      - method (str): Método de enlace ('ward', 'single', 'complete', 'average', etc.).
+      - metric (str): Métrica de distancia ('euclidean', 'manhattan', etc.).
+      - title (str): Título del gráfico.
+      
+    Retorna:
+      - clusters: Arreglo con la asignación de clusters para cada muestra.
+    """
+    # Calcular la matriz de enlace
+    Z = linkage(data, method=method, metric=metric)
+    
+    # Obtener la asignación de clusters usando fcluster (criterio 'maxclust')
+    clusters = fcluster(Z, num_clusters, criterion='maxclust')
+    
+    # Para determinar el umbral de corte:
+    # Una estrategia simple es ordenar las distancias de fusión y tomar el valor que separa los últimos (num_clusters-1) enlaces.
+    distances = Z[:, 2]
+    if num_clusters > 1:
+        threshold = np.sort(distances)[- (num_clusters - 1)]
+    else:
+        threshold = 0
+
+    # Crear la figura del dendrograma
+    fig, ax = plt.subplots(figsize=(10, 6))
+    
+    # Generar el dendrograma utilizando color_threshold para que las ramas cambien de color
+    dendrogram(Z, ax=ax, color_threshold=threshold)
+    
+    # Dibujar una línea horizontal que indica el corte
+    ax.axhline(y=threshold, c='red', lw=2, linestyle='dashed', label=f'Corte para {num_clusters} clusters')
+    ax.set_title(title)
+    ax.set_xlabel('Índice de muestra')
+    ax.set_ylabel('Distancia')
+    ax.legend()
+    
+    st.pyplot(fig)
+    return clusters
+
+
+
 def show_teory_metrics_clustering():
     col1, col2 = st.columns(2)
     with col1:
