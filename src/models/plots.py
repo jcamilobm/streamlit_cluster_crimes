@@ -79,6 +79,35 @@ def show_model_metrics_table(df, title='📊 Comparación de métricas'):
 
 
 
+
+
+# Función que calcula y dibuja la tabla de frecuencias en Streamlit
+def show_labels_frequency_table(labels):
+    # Calcular tamaños y porcentajes de cada cluster
+    cluster_sizes = pd.Series(labels).value_counts()
+    cluster_percentages = pd.Series(labels).value_counts(normalize=True) * 100
+
+    # Crear un DataFrame resumen
+    cluster_summary = pd.DataFrame({
+        'Cluster': cluster_sizes.index,
+        'Tamaño del Clúster': cluster_sizes.values,
+        'Peso (%)': cluster_percentages.values.round(2)
+    }).sort_values(by='Cluster').reset_index(drop=True)
+
+    # Visualización en Streamlit
+    st.subheader('Tabla de Frecuencias de Clusters')
+    st.markdown("""
+    Esta tabla muestra el tamaño de cada clúster y su peso porcentual dentro del total.
+    """)
+
+    # Mostrar la tabla con formato bonito
+    st.dataframe(cluster_summary.style.format({
+        'Tamaño del Clúster': '{:,}',
+        'Peso (%)': '{:.2f}%'
+    }))
+
+
+
 def show_teory_metrics_clustering():
     col1, col2 = st.columns(2)
     with col1:

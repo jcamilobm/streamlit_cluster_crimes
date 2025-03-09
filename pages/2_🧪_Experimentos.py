@@ -4,7 +4,7 @@ from src.EDA.data_manager import load_all_data_and_clean
 from src.components.DatasetFilterSidebar import DatasetFilterSidebar
 from src.models.model_data_preparation import get_model_data, scale_data
 from src.models.helper import calculate_clustering_metrics, calculate_score_normalizado
-from src.models.plots import show_model_metrics_table,show_teory_metrics_clustering
+from src.models.plots import show_model_metrics_table,show_teory_metrics_clustering, show_labels_frequency_table
 
 from sklearn.cluster import KMeans, AgglomerativeClustering
 
@@ -185,7 +185,10 @@ if posFilaSeleccionada != "Sin seleccion de fila" :
     n_clusters = st.session_state.results[posFilaSeleccionada]['Clusters']
     labels = st.session_state.results[posFilaSeleccionada]['Labels']
     st.markdown(f"""
-    ### 🤖 Modelo Seleccionado
+    ### Modelo Seleccionado
     - **Modelo:** {modelo}  
     - **Número de Clusters:** {n_clusters}
     """)
+
+    show_labels_frequency_table(labels)
+    #plot_heatmap_clusters_kmeans(df_model,model)
