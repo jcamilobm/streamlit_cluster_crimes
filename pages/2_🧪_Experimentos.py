@@ -209,6 +209,8 @@ if posFilaSeleccionada != "Sin seleccion de fila" :
 
     n_clusters = st.session_state.results[posFilaSeleccionada]['Clusters']
     labels = st.session_state.results[posFilaSeleccionada]['Labels']
+
+    st.markdown("---")
     st.markdown(f"""
     ### Modelo Seleccionado
     - **Modelo:** {modelo}  
@@ -216,14 +218,15 @@ if posFilaSeleccionada != "Sin seleccion de fila" :
     - **Escala:** {escala}  
     - **Metodo de Distancia:** {distancia}
     """)
-
-    show_labels_frequency_table(labels)
+    col1, col2 = st.columns([1.7, 2])  # Ajuste del ancho de las columnas
+    with col1:
+        show_labels_frequency_table(labels)
+    with col2:
+    # preparar datos para mapa
+        df_pivot_with_clusters, geojson_data = prepare_geojson_with_clusters(df_identifiers, df_model, labels, df_geo)
+        plot_clusters_map(df_pivot_with_clusters , geojson_data)
 
     if modelo == "K-means":
-        plot_heatmap_clusters_kmeans(df_model,model)
+            plot_heatmap_clusters_kmeans(df_model,model)
     else:
-        plot_dendrogram_jerarquico(df_model, n_clusters)
-
-    # preparar datos para mapa
-    df_pivot_with_clusters, geojson_data = prepare_geojson_with_clusters(df_identifiers, df_model, labels, df_geo)
-    plot_clusters_map(df_pivot_with_clusters , geojson_data)
+            plot_dendrogram_jerarquico(df_model, n_clusters)

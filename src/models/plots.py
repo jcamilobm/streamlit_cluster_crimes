@@ -95,7 +95,7 @@ def show_labels_frequency_table(labels):
     }).sort_values(by='Cluster').reset_index(drop=True)
 
     # Visualización en Streamlit
-    st.subheader('Tabla de Frecuencias de Clusters')
+    # st.subheader('Tabla de Frecuencias de Clusters')
     st.markdown("""
     Esta tabla muestra el tamaño de cada clúster y su peso porcentual dentro del total.
     """)
@@ -105,6 +105,12 @@ def show_labels_frequency_table(labels):
         'Tamaño del Clúster': '{:,}',
         'Peso (%)': '{:.2f}%'
     }))
+
+    st.markdown("""
+     La proporción de los clusters indica si la segmentación es equilibrada y su impacto en el análisis. 
+    """)
+
+   
 
 
 
@@ -256,7 +262,7 @@ def show_teory_metrics_clustering():
 
 def plot_clusters_map(df_pivot_clusters_and_geo, geojson_data):
     # Crear el mapa centrado en Bucaramanga
-    fig = Figure(width=360, height=400)
+    fig = Figure(width=150, height=150)
     mapa = folium.Map(location=[7.1254, -73.1198],
                       zoom_start=12,
                       tiles="CartoDB positron",
@@ -292,7 +298,7 @@ def plot_clusters_map(df_pivot_clusters_and_geo, geojson_data):
     col1, col2 = st.columns([0.7, 0.3])
 
     with col1:
-        st_folium(mapa, width=700, height=500)
+        st_folium(mapa, width=300, height=330)
 
     with col2:
         # Obtener clusters únicos para la leyenda
