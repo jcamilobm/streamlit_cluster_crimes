@@ -305,3 +305,52 @@ def run_all_experiments(X_df):
             })
 
     st.success("✅ Se ejecutaron todas las combinaciones y los resultados están guardados en session_state['results']")
+
+
+
+
+
+import pandas as pd
+
+def calcular_RME(df, 
+                 columnas_eventos=['Crimen Organizado', 'Delitos Sexuales', 'Delitos Violentos', 'Robos y Hurtos', 'Violencia Familiar'], 
+                 columna_poblacion='personas', 
+                 solo_rme=True):
+    """
+    Calcula la Razón de Morbilidad Estandarizada (RME) para cada columna de eventos.
+
+    Parámetros:
+      - df: DataFrame que contiene los datos.
+      - columnas_eventos: Lista de nombres de columnas que representan los eventos. 
+                          Por defecto: ['Crimen Organizado', 'Delitos Sexuales', 'Delitos Violentos', 'Robos y Hurtos', 'Violencia Familiar'].
+      - columna_poblacion: Nombre de la columna que contiene la población. Por defecto: 'personas'.
+      - solo_rme: Booleano que, si es True (por defecto), retorna únicamente las columnas que comienzan con "RME_". 
+                  Si es False, retorna el DataFrame completo con las columnas adicionales.
+    
+    Proceso:
+      1. Calcula la tasa global para cada evento (total del evento en todas las comunas / población total).
+      2. Calcula los casos esperados en cada comuna (población de la comuna * tasa global).
+      3. Calcula la RME: Observados / Esperados.
+    """
+    # Calcular la población total (una sola vez)
+    total_population = df[columna_poblacion].sum()
+    
+    # Iterar sobre cada columna de evento para calcular la RME
+    for col in columnas_eventos:
+        # a) Calcular la tasa global para el evento
+        total_event = df[col].sum()  # Total del evento en todas las comunas
+        global_rate = total_event / total_population  # Casos por persona en el conjunto
+        
+        # b) Calcular los casos esperados en cada comuna para el evento
+        df[f'expected_{col}'] = df[columna_poblacion] * global_rate
+        
+        # c) Calcular la RME: Observados / Esperados
+        df[f'RME_{col}'] = df[col] / df[f'expected_{col}']
+    
+    # Retornar solo las columnas RME si solo_rme es True
+    if solo_rme:
+        rme_cols = [col for col in df.columns if col.startswith('RME_')]
+        return df[rme_cols]
+    
+    # Si solo_rme es False, retornar el DataFrame completo
+    return df
