@@ -59,7 +59,6 @@ with st.expander("Ver Datos completos pivoteados"):
 
 
 # Variables del modelo
-# Variables del modelo
 col1, col2 = st.columns([4, 1])
 
 with col1:
@@ -78,7 +77,7 @@ opciones_tasa_crimenes = [
     "Crimenes por 1000hab",
     "Crimenes por 1000hab log"
 ]
-st.dataframe( df_model.columns)
+
 # Creamos dos columnas
 col1, col2 = st.columns(2)
 
@@ -221,7 +220,7 @@ if posFilaSeleccionada != "Sin seleccion de fila" :
     ### Modelo Seleccionado
     - **Modelo:** {modelo}  
     - **Número de Clusters:** {n_clusters}
-    - **Escala:** {escala}  
+    - **Escala:** {escala}.  Si escogio RME, la ya no aplica a las categorias de crimenes.
     - **Metodo de Distancia:** {distancia}
     """)
     col1, col2 = st.columns([1.7, 2])  # Ajuste del ancho de las columnas
