@@ -51,6 +51,7 @@ df_crimesf = DatasetFilterSidebar(df_crimes, st.session_state.deshabilitar_boton
 # Obtener tabla para los modelos de machine learning
 
 df_model , df_identifiers = get_model_data(df_crimesf, df_poblacion , df_geo)
+df_model  = calcular_RME(df_model , solo_rme=False)
 
 with st.expander("Ver Datos completos pivoteados"):
     df_concatenado = pd.concat([ df_identifiers, df_model], axis=1)
@@ -70,19 +71,19 @@ with col2:
 
 
 
-
 # Opciones para la tasa de crímenes
 opciones_tasa_crimenes = [
     "Sin tasa",
+    "Estandarización indirecta RME",
     "Crimenes por 1000hab",
     "Crimenes por 1000hab log"
 ]
-
+st.dataframe( df_model.columns)
 # Creamos dos columnas
 col1, col2 = st.columns(2)
 
 with col1:
-    seleccion_tasa = st.radio("Tasa de crimen:", opciones_tasa_crimenes, disabled=st.session_state.deshabilitar_botones)
+    seleccion_tasa = st.radio("Tasa de crimen:", opciones_tasa_crimenes, disabled = st.session_state.deshabilitar_botones)
     # Definición de columnas según la opción elegida
     if seleccion_tasa == "Sin tasa":
         opciones_crimenes_seleccionada = [
@@ -90,6 +91,11 @@ with col1:
             'Delitos Violentos', 'Robos y Hurtos', 
             'Violencia Familiar'
         ]
+    elif seleccion_tasa == "Estandarización indirecta RME":
+       # df_model = calcular_RME(df_model)
+       opciones_crimenes_seleccionada = [col for col in df_model.columns if 'RME' in col]
+       pass
+
     elif seleccion_tasa  == "Crimenes por 1000hab":
         opciones_crimenes_seleccionada = [col for col in df_model.columns if 'hab' in col and 'log' not in col]
     elif seleccion_tasa == "Crimenes por 1000hab log":

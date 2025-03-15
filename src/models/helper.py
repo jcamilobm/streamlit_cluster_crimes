@@ -169,16 +169,19 @@ def prepare_geojson_with_clusters(df_identifiers, df_model, labels, gdf):
 
 def scale_data(df, method):
     """
-    Escala un DataFrame según el método especificado.
+    Escala las columnas numéricas de un DataFrame según el método especificado,
+    EXCLUYENDO aquellas columnas que contengan "RME" en su nombre.
+    Se excluye RME ya que esas columnas ya se escalaron con una normalziacion especal en abse a la poblacion.
     
     Parámetros:
     - df (pd.DataFrame): Datos a escalar.
     - method (str): Método de escalado ('StandardScaler (Z-score)', 'MinMaxScaler (0-1)', 'RobustScaler').
-
+    
     Retorna:
-    - pd.DataFrame: DataFrame escalado con las mismas columnas e índice original.
+    - pd.DataFrame: DataFrame con las mismas columnas e índice original, donde solo se han escalado 
+      las columnas que no contienen "RME".
     """
-
+    
     scalers = {
         'StandardScaler (Z-score)': StandardScaler(),
         'MinMaxScaler (0-1)': MinMaxScaler(),
@@ -190,10 +193,26 @@ def scale_data(df, method):
 
     scaler = scalers[method]
     
-    # Escalar datos manteniendo el índice y columnas originales
-    scaled_data = pd.DataFrame(scaler.fit_transform(df), columns=df.columns, index=df.index)
+    # Determinar las columnas a escalar: aquellas que no contengan "RME"
+    columns_to_scale = [col for col in df.columns if "RME" not in col]
     
-    return scaled_data
+    # Si no hay columnas para escalar, se retorna el DataFrame original
+    if not columns_to_scale:
+        return df.copy()
+    
+    # Escalar únicamente las columnas seleccionadas, manteniendo el índice
+    scaled_subset = pd.DataFrame(scaler.fit_transform(df[columns_to_scale]),
+                                 columns=columns_to_scale,
+                                 index=df.index)
+    
+    # Crear una copia del DataFrame original
+    df_scaled = df.copy()
+    # Reemplazar las columnas escaladas en la copia
+    for col in columns_to_scale:
+        df_scaled[col] = scaled_subset[col]
+    
+    return df_scaled
+
 
 def run_manual_experiment(df_model, model_type, n_clusters, distance_metric, scaling_method):
     """
