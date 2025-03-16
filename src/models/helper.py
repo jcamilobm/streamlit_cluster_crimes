@@ -230,7 +230,7 @@ def run_manual_experiment(df_model, model_type, n_clusters, distance_metric, sca
     model = get_clustering_model(model_type, n_clusters, distance_metric)
     
     # Escalar los datos
-    df_model_scaled =  scale_data(df_model, scaling_method)
+    df_model_scaled = scale_data(df_model, scaling_method)
 
     # Ejecutar clustering
     labels = model.fit_predict(df_model_scaled)
@@ -238,8 +238,8 @@ def run_manual_experiment(df_model, model_type, n_clusters, distance_metric, sca
     # Calcular métricas (si es K-means, se pasa el modelo para calcular inercia)
     metrics = calculate_clustering_metrics(df_model_scaled, labels, model if model_type == 'K-means' else None)
 
-    # Guardar resultados en `st.session_state`
-    st.session_state.results.append({
+    # Crear el diccionario del nuevo experimento
+    new_experiment = {
         'Modelo': model_type,
         'Clusters': n_clusters,
         'Escalado': scaling_method,
@@ -247,9 +247,19 @@ def run_manual_experiment(df_model, model_type, n_clusters, distance_metric, sca
         'Modelo Entrenado': model,  # Guarda el modelo completo
         'Labels': labels,  # Etiquetas de clusterización
         **metrics  # Agregar métricas de evaluación dinámicamente
-    })
+    }
     
-    st.success("✅ Se ejecutó el clustering manual y se guardó en `st.session_state.results`")
+    # Validar si ya existe un experimento con los mismos parámetros
+    if any(exp['Modelo'] == model_type and exp['Clusters'] == n_clusters and 
+           exp['Escalado'] == scaling_method and exp['distance_metric'] == distance_metric
+           for exp in st.session_state.results):
+        st.warning("❌ Experimento existente, escoge otros parametros")
+        return
+
+    # Guardar el nuevo experimento en `st.session_state.results`
+    st.session_state.results.append(new_experiment)
+    st.success("✅ Se ejecutó el clustering manual")
+
 
 
 import itertools
@@ -331,7 +341,7 @@ def run_all_experiments(X_df):
             st.session_state.results.append(result)
             st.session_state.experiment_id += 1
 
-    st.success("✅ Se ejecutaron todas las combinaciones y los resultados están guardados en session_state['results']")
+    st.success("✅ Se ejecutaron todas las combinaciones posibles de clustering con los filtros de modelo, #clusters, escalado, y metodo de distancia.")
 
 
 
