@@ -35,7 +35,7 @@ def send_llm_request(user_prompt_dinamico, system_prompt=system_prompt,
     # Instanciar el cliente OpenAI (utilizando OpenRouter)
     client = OpenAI(
       base_url="https://openrouter.ai/api/v1",
-      api_key="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"
+      api_key="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"
     )
     
     # Construir los mensajes de la conversación

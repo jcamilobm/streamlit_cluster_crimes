@@ -310,11 +310,14 @@ if posFilaSeleccionada != "Sin seleccion de fila" :
     #st.write(dict_api_llm)
     #st.write(type(dict_api_llm))
 
-
-
-    response_text = send_llm_request(json_string_prompt_llm )
-    st.write(response_text)
-
+    st.markdown("---")
+    st.markdown("### Sugerencias de ejecución")
+    if st.button("🤖 Interpretar resultados con IA", type = "primary"):
+        with st.spinner("Cargando respuesta de la API..."):
+            response_text = send_llm_request(json_string_prompt_llm)
+        st.write(response_text)
+    else:
+        st.write("Presiona el botón para recibir sugerencias de ejecución de un modelo de lenguaje.")
 
 
 
