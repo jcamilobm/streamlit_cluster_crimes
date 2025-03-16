@@ -1,5 +1,10 @@
 import pandas as pd
 import json
+import warnings
+from sklearn.cluster import KMeans
+
+from scipy.cluster.hierarchy import linkage
+import numpy as np
 
 def labels_frequency_dict(labels):
     # Convertir a Series y ordenar por el índice (si los clusters son numéricos)
@@ -43,19 +48,122 @@ def agrupar_metricas(dict_results: dict) -> dict:
 
 
 
+def cluster_centers_kmeans(df_model, model):
+    """
+    Extrae los centros de clúster del modelo KMeans y los convierte en una lista de diccionarios.
+    
+    Parámetros:
+      df_model: pd.DataFrame
+          DataFrame original utilizado para entrenar el modelo. Se usan sus columnas como claves.
+      model: objeto entrenado de KMeans.
+      
+    Retorna:
+      list: Lista de diccionarios, cada uno representando un centro de clúster.
+            Si el modelo no es de tipo KMeans, se emite una advertencia y se retorna una lista vacía.
+    """
+    # Verificar si el modelo es una instancia de KMeans
+    if not isinstance(model, KMeans):
+        warnings.warn("El modelo proporcionado no es una instancia de KMeans. No se pueden extraer los centros.")
+        return [] 
+
+    # Obtener los nombres de las columnas del DataFrame
+    columnas = df_model.columns.tolist()
+    
+    # Obtener los centros de clúster del modelo
+    centers = model.cluster_centers_
+    
+    # Convertir cada centro en un diccionario usando las columnas como claves
+    centers_list = []
+    for center in centers:
+        center_dict = {col: float(val) for col, val in zip(columnas, center)}
+        centers_list.append(center_dict)
+    
+    return centers_list
 
 
 
+def compute_linkage_summary_jerarquico(X_scaled, method='ward'):
+    """
+    Calcula la matriz de enlace para datos escalados usando el método especificado.
+     permite realizar un análisis más profundo y ofrecer interpretaciones y recomendaciones 
+     basadas en la estructura jerárquica del clustering.
+    
+    Parámetros:
+      X_scaled: np.ndarray
+          Matriz de datos escalados.
+      method: str (opcional)
+          Método de enlace a utilizar (por ejemplo, 'ward', 'average', 'complete').
+          
+    Retorna:
+      List[Dict]: Una lista de diccionarios, cada uno representando una fusión, con las claves:
+          - cluster1: ID del primer cluster fusionado.
+          - cluster2: ID del segundo cluster fusionado.
+          - distance: Distancia entre los clusters fusionados.
+          - sample_count: Número de observaciones en el nuevo cluster.
+    """
+    # Calcular la matriz de enlace
+    Z = linkage(X_scaled, method=method)
+    
+    # Convertir la matriz de enlace a una lista de diccionarios para facilitar la serialización en JSON
+    merge_list = []
+    for row in Z:
+        merge_dict = {
+            "cluster1": int(row[0]),
+            "cluster2": int(row[1]),
+            "distance": float(row[2]),
+            "sample_count": int(row[3])
+        }
+        merge_list.append(merge_dict)
+    
+    return merge_list
 
-def unir_json(json_str_1, json_str_2):
-    # 1. Cargar cada JSON como diccionario
-    data1 = json.loads(json_str_1)
-    data2 = json.loads(json_str_2)
 
-    # 2. Insertar el contenido del segundo JSON dentro del primero
-    #    Aquí decides en qué clave quieres guardarlo.
-    #    Por ejemplo, podrías llamarlo "DistribucionClusters".
-    data1["DistribucionClusters"] = data2
+def llm_build_zonas_list(df_identifiers, df_model_scaled, df_descripcion_comunas):
+    """
+    Construye la lista de zonas a partir de los DataFrames:
+      - df_identifiers: Información identificadora de las zonas.
+      - df_model_scaled: Datos del modelo escalados.
+      - df_descripcion_comunas: Descripciones de las comunas.
+      
+    El proceso realiza:
+      1. Concatenación de df_identifiers y df_model_scaled.
+      2. Merge con df_descripcion_comunas usando "num_com" e "id" como llave.
+      3. Eliminación de las columnas 'id' y 'comuna'.
+      4. Conversión del DataFrame resultante a una lista de diccionarios.
+    
+    Retorna:
+      list: Una lista de diccionarios, cada uno representando una zona.
+    """
+    # Concatenar los DataFrames identificadores y los datos escalados
+    df = pd.concat([df_identifiers, df_model_scaled], axis=1)
+    
+    # Hacer merge con las descripciones, usando "num_com" (en df) y "id" (en df_descripcion_comunas)
+    df = pd.merge(df, df_descripcion_comunas, how="inner", left_on="num_com", right_on="id")
+    
+    # Eliminar las columnas que no se desean en el resultado final
+    df.drop(["id", "comuna"], axis=1, inplace=True)
+    
+    # Convertir el DataFrame a lista de diccionarios
+    zonas_list = df.to_dict(orient="records")
+    
+    return zonas_list
 
-    # 3. Convertir el resultado a una cadena JSON
-    return data1
+def llm_assign_clusters_to_zonas_list(zonas_list, labels):
+    """
+    Asigna a cada elemento de zonas_list el cluster correspondiente de labels.
+    
+    Parámetros:
+      zonas_list (list): Lista de diccionarios, cada uno representando una zona.
+      labels (np.ndarray): Array de NumPy con la asignación de clusters.
+      
+    Retorna:
+      list: La misma lista, con cada diccionario enriquecido con la clave "cluster_asignado".
+    """
+    # Verificar si el número de zonas coincide con el número de labels
+    if len(zonas_list) != len(labels):
+        raise ValueError("La cantidad de zonas no coincide con la cantidad de labels.")
+    
+    for i, zona in enumerate(zonas_list):
+        zona["cluster_asignado"] = int(labels[i])
+    
+    return zonas_list

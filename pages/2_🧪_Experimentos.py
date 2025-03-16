@@ -8,6 +8,8 @@ from src.models.helper import *
 from src.models.plots import *
 from sklearn.cluster import KMeans, AgglomerativeClustering
 
+from src.LLM.data_manager_llm import *
+
 st.set_page_config(
     page_title="Experimentos modelos",
     page_icon="🧪",
@@ -18,8 +20,8 @@ st.set_page_config(
 if 'results' not in st.session_state:
     st.session_state.results = []
 
-if "deshabilitar_botones_filtros_datos_filtros_datos" not in st.session_state:
-    st.session_state.deshabilitar_botones_filtros_datos_filtros_datos = False
+if "deshabilitar_botones_filtros_datos" not in st.session_state:
+    st.session_state.deshabilitar_botones_filtros_datos = False
 
 if "deshabilitar_boton_ejecutar_modelo" not in st.session_state:
     st.session_state.deshabilitar_boton_ejecutar_modelo = False
@@ -31,16 +33,16 @@ if "deshabilitar_boton_run_many_experiments" not in st.session_state:
 #    st.session_state.deshabilitar_botones_filtros_datos = True
 
 def deshabilitar_filtros_ejecutar_un_modelo():
-    st.session_state.deshabilitar_botones_filtros_datos_filtros_datos = True
+    st.session_state.deshabilitar_botones_filtros_datos = True
     st.session_state.deshabilitar_boton_run_many_experiments = True
 
 def deshabilitar_filtros_run_many_experiments():
-    st.session_state.deshabilitar_botones_filtros_datos_filtros_datos= True 
+    st.session_state.deshabilitar_botones_filtros_datos= True 
     st.session_state.deshabilitar_boton_ejecutar_modelo = True
     st.session_state.deshabilitar_boton_run_many_experiments = True
 
 def habilitar_filtros():
-    st.session_state.deshabilitar_botones_filtros_datos_filtros_datos = False
+    st.session_state.deshabilitar_botones_filtros_datos = False
     st.session_state.deshabilitar_boton_ejecutar_modelo = False
     st.session_state.deshabilitar_boton_run_many_experiments = False
     st.session_state.results = []
@@ -65,7 +67,7 @@ else:
     df_descripcion_comunas = st.session_state.df_descripcion_comunas
 
 # 3. Dibujar side y filtrar datos
-df_crimesf = DatasetFilterSidebar(df_crimes, st.session_state.deshabilitar_botones_filtros_datos_filtros_datos)
+df_crimesf = DatasetFilterSidebar(df_crimes, st.session_state.deshabilitar_botones_filtros_datos)
 
 
 # Obtener tabla para los modelos de machine learning
@@ -283,24 +285,6 @@ if posFilaSeleccionada != "Sin seleccion de fila" :
     #  LLM
 
 
-    llm_df_data = pd.concat([df_identifiers, df_model_scaled], axis=1)
-    llm_df_data = pd.merge(llm_df_data,df_descripcion_comunas, how="inner", left_on="num_com", right_on="id")
-    llm_df_data.drop(["id","comuna"], axis=1, inplace=True)
-
-    st.markdown("---")
-
-   # st.dataframe(df_model_scaled)
-   # st.dataframe(df_identifiers)
-
-    llm_df_data = pd.concat([df_identifiers, df_model_scaled], axis=1)
-    llm_df_data = pd.merge(llm_df_data,df_descripcion_comunas, how="inner", left_on="num_com", right_on="id")
-    llm_df_data.drop(["id","comuna"], axis=1, inplace=True)
-
-
-    zonas_list = llm_df_data.to_dict(orient="records")
-
-
-
     # Datos de ejemplo del modelo de clustering (por ejemplo, KMeans)
    # st.write(posFilaSeleccionada)
 
@@ -308,25 +292,25 @@ if posFilaSeleccionada != "Sin seleccion de fila" :
 
     
     dict_results = st.session_state.results[posFilaSeleccionada].copy()
+    
+    #st.json(dict_results)
+    dict_model_info = llm_build_model_info(dict_results["Modelo"], dict_results['Clusters'],  dict_results['distance_metric'] , seleccion_tasa , seleccion_tasa, dict_results['Escalado'])
+                                          
+    dict_sklearn_model = llm_build_results_sklearn(dict_results, df_model_scaled, model)
+
+    zonas_list = llm_build_zonas_list(df_identifiers, df_model_scaled, df_descripcion_comunas)
+    zonas_list_with_clusters = llm_assign_clusters_to_zonas_list(zonas_list, dict_results['Labels'])
 
 
 
 
-
-    from src.LLM.helper import *
-
-    st.markdown("---")
-    st.write(posFilaSeleccionada)
-    st.markdown("---")
-
-    dict_sklearn_model = {
-        # "labels_": dict_results.Labels ,
-        "proporciones_clusters" : labels_frequency_dict(dict_results["Labels"]) ,
-        "metricas": agrupar_metricas(dict_results),
-        "labels_": dict_results["Labels"].tolist()
+    dict_api_llm =  {
+       "informacion_modelo": dict_model_info  ,
+       "resultados_modelo": dict_sklearn_model ,
+       "comunas": zonas_list_with_clusters
     }
+    st.write(dict_api_llm)
 
-    st.json(dict_sklearn_model)
 
 
 
