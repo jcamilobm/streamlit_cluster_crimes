@@ -1,6 +1,16 @@
 from src.utils.config_loader import load_config
 from openai import OpenAI
 
+import os
+from dotenv import load_dotenv
+# Carga las variables definidas en .env
+
+
+load_dotenv()
+# Obtén la API key
+api_key_llm = os.getenv("API_KEY")
+
+
 config = load_config() 
 system_prompt = config["llm"]["system_prompt"]
 
@@ -35,7 +45,7 @@ def send_llm_request(user_prompt_dinamico, system_prompt=system_prompt,
     # Instanciar el cliente OpenAI (utilizando OpenRouter)
     client = OpenAI(
       base_url="https://openrouter.ai/api/v1",
-      api_key="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"
+      api_key= api_key_llm
     )
     
     # Construir los mensajes de la conversación
