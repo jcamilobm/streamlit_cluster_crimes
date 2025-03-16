@@ -252,76 +252,84 @@ def run_manual_experiment(df_model, model_type, n_clusters, distance_metric, sca
     st.success("✅ Se ejecutó el clustering manual y se guardó en `st.session_state.results`")
 
 
+import itertools
+from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler
+from sklearn.cluster import KMeans, AgglomerativeClustering
+from sklearn.metrics import silhouette_score, davies_bouldin_score, calinski_harabasz_score
+import streamlit as st
 
 def run_all_experiments(X_df):
     """Ejecuta todas las combinaciones de clustering y almacena los resultados en st.session_state['results'].
-
+    
     Parámetros:
-    - X_df: pd.DataFrame -> Datos reales del usuario en formato DataFrame (sin escalar).
+        X_df: pd.DataFrame -> Datos reales del usuario en formato DataFrame (sin escalar).
     """
-
+    
     # Convertir DataFrame a array de numpy
-    X = X_df.to_numpy()
+    X = X_df.copy().to_numpy()
 
     # Definir los valores posibles de cada parámetro
     model_types = ["K-means", "Clustering Jerárquico"]
-    n_clusters_options = list(range(3, 6))  # De 2 a 6 clusters
+    n_clusters_options = list(range(3, 6))  # Ejemplo: 3 a 5 clusters
     scaling_methods = ["StandardScaler", "MinMaxScaler", "RobustScaler"]
     distance_metrics = ["Euclidean", "Manhattan", "Cosine", "Correlation"]
 
-    # Inicializar `st.session_state.results` si no existe
+    # Inicializar st.session_state.results si no existe
     if "results" not in st.session_state:
         st.session_state.results = []
+    
+    # Inicializar un contador de experimentos único
+    if "experiment_id" not in st.session_state:
+        st.session_state.experiment_id = 0
 
-    # Recorrer primero un modelo y luego el otro
+    # Recorrer cada modelo y cada combinación de parámetros
     for model_type in model_types:
-        # Ajustar métricas de distancia según el modelo seleccionado
         metrics_to_use = ["Euclidean"] if model_type == "K-means" else distance_metrics
 
-        # Generar todas las combinaciones de parámetros
         for n_clusters, scaling_method, distance_metric in itertools.product(n_clusters_options, scaling_methods, metrics_to_use):
-            # Aplicar escalado
+            # Escalar los datos
             scaler = {
                 "StandardScaler": StandardScaler(),
                 "MinMaxScaler": MinMaxScaler(),
                 "RobustScaler": RobustScaler()
             }[scaling_method]
-            
-            X_scaled = scaler.fit_transform(X)  # Escalar los datos reales
+            X_scaled = scaler.fit_transform(X)
 
-            # Configurar y ejecutar el modelo
+            # Ejecutar el modelo y obtener etiquetas
             if model_type == "K-means":
                 model = KMeans(n_clusters=n_clusters, random_state=42)
-                model.fit(X_scaled)  # Ajustar modelo para obtener `inertia_`
+                model.fit(X_scaled)
                 inertia = model.inertia_
                 labels = model.predict(X_scaled)
             else:
                 linkage_method = "ward" if distance_metric == "Euclidean" else "average"
                 model = AgglomerativeClustering(n_clusters=n_clusters, metric=distance_metric.lower(), linkage=linkage_method)
                 labels = model.fit_predict(X_scaled)
-                inertia = None  # AgglomerativeClustering no tiene `inertia_`
+                inertia = None
 
-            # Calcular métricas de evaluación
+            # Calcular las métricas de evaluación
             metrics = {
                 "Silhouette Score": silhouette_score(X_scaled, labels),
                 "Davies-Bouldin": davies_bouldin_score(X_scaled, labels),
                 "Calinski-Harabasz": calinski_harabasz_score(X_scaled, labels)
             }
-
-            # Agregar Inercia solo si el modelo es K-Means
             if inertia is not None:
                 metrics["Inercia"] = inertia
 
-            # Guardar resultados en el formato correcto
-            st.session_state.results.append({
+            # Crear el diccionario de resultado y asignar un ID único
+            result = {
+                "experiment_id": st.session_state.experiment_id,  # ID único para este experimento
                 "Modelo": model_type,
                 "Clusters": n_clusters,
                 "Escalado": scaling_method,
                 "distance_metric": distance_metric,
-                "Modelo Entrenado": model,  # Guardamos el modelo completo
-                "Labels": labels,  # Etiquetas del clustering
-                **metrics  # Se expanden las métricas dentro del diccionario
-            })
+                "Modelo Entrenado": model,  # Se guarda el modelo completo
+                "Labels": labels,           # Etiquetas del clustering
+                **metrics
+            }
+
+            st.session_state.results.append(result)
+            st.session_state.experiment_id += 1
 
     st.success("✅ Se ejecutaron todas las combinaciones y los resultados están guardados en session_state['results']")
 

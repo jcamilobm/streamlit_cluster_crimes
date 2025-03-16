@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 
 from pathlib import Path
 from src.utils.config_loader import load_config
@@ -49,16 +50,19 @@ def load_all_data_and_clean(config_path: str = "config/config.yaml"):
     crimes_path = config["paths"]["raw_data"]["crimes"]
     population_path = config["paths"]["raw_data"]["population"]
     geolocation_path = config["paths"]["raw_data"]["geolocation"]
+    descripcion_comunas_path = config["paths"]["raw_data"]["descripcion_comunas"]
 
     # Cargar los datos directamente
     df_crimes = load_data(crimes_path, dtype_crimes)
     df_crimes = eda_crimes(df_crimes)
 
-    df_geolocation = load_data(geolocation_path)
-    df_geolocation = eda_df_geo(df_geolocation)
+    df_geo  = load_data(geolocation_path)
+    df_geo = eda_df_geo(df_geo)
 
     df_poblacion = load_data(population_path)
     df_poblacion = eda_pobl(df_poblacion)
 
-    return df_crimes, df_poblacion, df_geolocation, config
+    df_descripcion_comunas = pd.read_excel(descripcion_comunas_path, sheet_name="descripciones_comunas")
+
+    return df_crimes, df_poblacion, df_geo , df_descripcion_comunas, config
 

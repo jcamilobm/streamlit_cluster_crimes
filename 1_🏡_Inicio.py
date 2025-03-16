@@ -14,7 +14,7 @@ st.title("Inicio")
 
 
 # 1. Carga de datos y config, todo en una función centralizada
-df_crimes , df_poblacion , df_geo , config = load_all_data_and_clean()
+df_crimes, df_poblacion, df_geo , df_descripcion_comunas, config = load_all_data_and_clean()
 
 # 2. # Cargar el dataset solo una vez en session state apra otras paginas
 if 'df_crimes' not in st.session_state:
@@ -26,9 +26,13 @@ if 'df_poblacion' not in st.session_state:
 if 'df_geo' not in st.session_state:
     st.session_state.df_geo = df_geo
 
+if 'df_descripcion_comunas' not in st.session_state:
+    st.session_state.df_descripcion_comunas  = df_descripcion_comunas 
+
 # 3. 
 df_crimesf = DatasetFilterSidebar(df_crimes)
 
 st.dataframe(df_crimesf)
+st.dataframe(st.session_state.df_descripcion_comunas )
 st.write(df_crimes.shape)
 st.write(df_crimesf.shape)

@@ -1,7 +1,11 @@
 import streamlit as st
+import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+
+from scipy.cluster.hierarchy import dendrogram, linkage, fcluster
+
 
 from st_aggrid import AgGrid, GridOptionsBuilder
 
@@ -30,8 +34,9 @@ def show_model_metrics_table(df, title='📊 Comparación de métricas'):
     df_subset = df[columnas].copy()
     
     # Eliminar duplicados basados en las columnas seleccionadas
-    df_clean = df_subset.drop_duplicates()
-    
+    #df_clean = df_subset.drop_duplicates()
+    df_clean =  df_subset.copy()
+
     # Configurar AgGrid
     gb = GridOptionsBuilder.from_dataframe(df_clean)
     gb.configure_default_column(
@@ -125,12 +130,6 @@ def plot_heatmap_clusters_kmeans(  data , model_kmeans):
     # Cerrar la figura para evitar que se acumulen
   plt.clf()
 
-
-
-
-
-from scipy.cluster.hierarchy import dendrogram, linkage, fcluster
-import numpy as np
 
 def plot_dendrogram_jerarquico(data, num_clusters, method='ward', metric='euclidean', title='Dendrograma'):
     """

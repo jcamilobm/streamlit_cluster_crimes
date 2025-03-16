@@ -18,16 +18,35 @@ st.set_page_config(
 if 'results' not in st.session_state:
     st.session_state.results = []
 
-if "deshabilitar_botones" not in st.session_state:
-    st.session_state.deshabilitar_botones = False
+if "deshabilitar_botones_filtros_datos_filtros_datos" not in st.session_state:
+    st.session_state.deshabilitar_botones_filtros_datos_filtros_datos = False
 
-def deshabilitar_filtros():
-    st.session_state.deshabilitar_botones = True
+if "deshabilitar_boton_ejecutar_modelo" not in st.session_state:
+    st.session_state.deshabilitar_boton_ejecutar_modelo = False
+
+if "deshabilitar_boton_run_many_experiments" not in st.session_state:
+    st.session_state.deshabilitar_boton_run_many_experiments = False
+
+#def deshabilitar_filtros():
+#    st.session_state.deshabilitar_botones_filtros_datos = True
+
+def deshabilitar_filtros_ejecutar_un_modelo():
+    st.session_state.deshabilitar_botones_filtros_datos_filtros_datos = True
+    st.session_state.deshabilitar_boton_run_many_experiments = True
+
+def deshabilitar_filtros_run_many_experiments():
+    st.session_state.deshabilitar_botones_filtros_datos_filtros_datos= True 
+    st.session_state.deshabilitar_boton_ejecutar_modelo = True
+    st.session_state.deshabilitar_boton_run_many_experiments = True
 
 def habilitar_filtros():
-    st.session_state.deshabilitar_botones = False
+    st.session_state.deshabilitar_botones_filtros_datos_filtros_datos = False
+    st.session_state.deshabilitar_boton_ejecutar_modelo = False
+    st.session_state.deshabilitar_boton_run_many_experiments = False
     st.session_state.results = []
 
+
+    
 #1. Titulo
 st.markdown("""
 # ⚔️ **K-means vs. Jerárquico**  
@@ -37,15 +56,16 @@ st.markdown("""
 
 # 2. # Cargar el dataset solo una vez en session state para otras paginas
 if 'df_crimes' not in st.session_state:
-    df_crimes , df_poblacion , df_geo , config = load_all_data_and_clean()
+    df_crimes, df_poblacion, df_geo , df_descripcion_comunas, config = load_all_data_and_clean()
     
 else:
     df_crimes = st.session_state.df_crimes
     df_poblacion = st.session_state.df_poblacion
     df_geo = st.session_state.df_geo
+    df_descripcion_comunas = st.session_state.df_descripcion_comunas
 
 # 3. Dibujar side y filtrar datos
-df_crimesf = DatasetFilterSidebar(df_crimes, st.session_state.deshabilitar_botones)
+df_crimesf = DatasetFilterSidebar(df_crimes, st.session_state.deshabilitar_botones_filtros_datos_filtros_datos)
 
 
 # Obtener tabla para los modelos de machine learning
@@ -82,7 +102,7 @@ opciones_tasa_crimenes = [
 col1, col2 = st.columns(2)
 
 with col1:
-    seleccion_tasa = st.radio("Tasa de crimen:", opciones_tasa_crimenes, disabled = st.session_state.deshabilitar_botones)
+    seleccion_tasa = st.radio("Tasa de crimen:", opciones_tasa_crimenes, disabled = st.session_state.deshabilitar_botones_filtros_datos)
     # Definición de columnas según la opción elegida
     if seleccion_tasa == "Sin tasa":
         opciones_crimenes_seleccionada = [
@@ -106,7 +126,7 @@ with col2:
         'Selecciona otras variables a considerar', 
         options=opciones_restantes,  
         default=opciones_restantes[-2:],
-        disabled=st.session_state.deshabilitar_botones
+        disabled=st.session_state.deshabilitar_botones_filtros_datos
     )
    # st.write("Columnas restantes seleccionadas:", opciones_restantes_selecionadas)
 
@@ -116,6 +136,8 @@ lista_concatenada = opciones_crimenes_seleccionada + opciones_restantes_selecion
 df_model  = df_model[lista_concatenada]
 
 df_model_scaled = scale_data(df_model, 'RobustScaler')
+
+
 plot_heatmap(df_model_scaled)
 
 
@@ -163,8 +185,8 @@ with st.expander("Ver tabla para el modelo escalada"):
     st.dataframe(df_model_scaled)
 
 col_run, col_reset = st.columns(2)
-run_model = col_run.button('🚀 Ejecutar Modelo', type="primary", on_click=deshabilitar_filtros)
-run_many_experiments = col_run.button('🚀 Ejecutar varias pruebas', type="primary", on_click=deshabilitar_filtros)
+run_model = col_run.button('🚀 Ejecutar Modelo', type="primary", on_click=deshabilitar_filtros_ejecutar_un_modelo, disabled = st.session_state.deshabilitar_boton_ejecutar_modelo)
+run_many_experiments = col_run.button('🚀 Ejecutar varias pruebas', type="primary", on_click=deshabilitar_filtros_run_many_experiments, disabled = st.session_state.deshabilitar_boton_run_many_experiments)
 reset_results = col_reset.button('🗑️ Borrar Resultados', type="secondary", on_click=habilitar_filtros)
 st.markdown("---")
 
@@ -184,7 +206,7 @@ posFilaSeleccionada = "Sin seleccion de fila"
 if st.session_state.results:
     st.subheader('📊 Resultados Comparativos')
 
-    results_df = pd.DataFrame(st.session_state.results)
+    results_df = pd.DataFrame(st.session_state.results).copy()
     results_df['Inercia'] = pd.to_numeric(results_df['Inercia'], errors='coerce')
     results_df.drop(columns=["Modelo Entrenado", "Labels"],inplace=True)
 
@@ -194,19 +216,30 @@ if st.session_state.results:
     response = show_model_metrics_table(df_norm)
     #response = show_table_with_preselected_row(df_norm, preselect_index=0)
     selected_rows = response.selected_rows
-
+    st.write(selected_rows)
+  
    # validar si devuelve un dataframe para evitar error
     if isinstance(selected_rows, pd.DataFrame):
-        posFilaSeleccionada = int(selected_rows.index[0])
-        st.write(posFilaSeleccionada)
+       posFilaSeleccionada = int(selected_rows.index[0])
+       st.write(posFilaSeleccionada)
         
+   ##     st.write(st.session_state.results)
+   ##     st.write(selected_rows)
+   
+   # if isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty:
+        # En lugar de usar el índice del DataFrame reindexado, lee el valor de la columna 'experiment_id'
+    #    posFilaSeleccionada = selected_rows["experiment_id"].iloc[0]
+    #    st.write("El experiment_id seleccionado es:", posFilaSeleccionada)
+   
+   
 # Mostrar informacion teorica de como interpretar las emtricas encontradas
 show_teory_metrics_clustering()
 
 
 # Input numérico básico
 if posFilaSeleccionada != "Sin seleccion de fila" :
-       
+    
+    
     modelo = st.session_state.results[posFilaSeleccionada]['Modelo']
     model = st.session_state.results[posFilaSeleccionada]['Modelo Entrenado']
     escala = st.session_state.results[posFilaSeleccionada]['Escalado']
@@ -214,6 +247,9 @@ if posFilaSeleccionada != "Sin seleccion de fila" :
 
     n_clusters = st.session_state.results[posFilaSeleccionada]['Clusters']
     labels = st.session_state.results[posFilaSeleccionada]['Labels']
+     
+    metric_silueta = st.session_state.results[posFilaSeleccionada]['Silhouette Score']
+    #metric_inercia = st.session_state.results[posFilaSeleccionada]['Labels']
 
     st.markdown("---")
     st.markdown(f"""
@@ -222,6 +258,7 @@ if posFilaSeleccionada != "Sin seleccion de fila" :
     - **Número de Clusters:** {n_clusters}
     - **Escala:** {escala}.  Si escogio RME, la ya no aplica a las categorias de crimenes.
     - **Metodo de Distancia:** {distancia}
+    - **Metrica Silueta:** {metric_silueta}
     """)
     col1, col2 = st.columns([1.7, 2])  # Ajuste del ancho de las columnas
     with col1:
@@ -235,3 +272,62 @@ if posFilaSeleccionada != "Sin seleccion de fila" :
             plot_heatmap_clusters_kmeans(df_model,model)
     else:
             plot_dendrogram_jerarquico(df_model, n_clusters)
+
+
+    
+
+
+
+
+    #--------------------------------------------------------------------------------
+    #  LLM
+
+
+    llm_df_data = pd.concat([df_identifiers, df_model_scaled], axis=1)
+    llm_df_data = pd.merge(llm_df_data,df_descripcion_comunas, how="inner", left_on="num_com", right_on="id")
+    llm_df_data.drop(["id","comuna"], axis=1, inplace=True)
+
+    st.markdown("---")
+
+   # st.dataframe(df_model_scaled)
+   # st.dataframe(df_identifiers)
+
+    llm_df_data = pd.concat([df_identifiers, df_model_scaled], axis=1)
+    llm_df_data = pd.merge(llm_df_data,df_descripcion_comunas, how="inner", left_on="num_com", right_on="id")
+    llm_df_data.drop(["id","comuna"], axis=1, inplace=True)
+
+
+    zonas_list = llm_df_data.to_dict(orient="records")
+
+
+
+    # Datos de ejemplo del modelo de clustering (por ejemplo, KMeans)
+   # st.write(posFilaSeleccionada)
+
+    # es improtante crear una copia, ya que si se modifica se altera lat abla dinamica de arriba y se pierde la fila seleccionada.
+
+    
+    dict_results = st.session_state.results[posFilaSeleccionada].copy()
+
+
+
+
+
+    from src.LLM.helper import *
+
+    st.markdown("---")
+    st.write(posFilaSeleccionada)
+    st.markdown("---")
+
+    dict_sklearn_model = {
+        # "labels_": dict_results.Labels ,
+        "proporciones_clusters" : labels_frequency_dict(dict_results["Labels"]) ,
+        "metricas": agrupar_metricas(dict_results),
+        "labels_": dict_results["Labels"].tolist()
+    }
+
+    st.json(dict_sklearn_model)
+
+
+
+    
