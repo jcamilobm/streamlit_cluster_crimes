@@ -9,6 +9,8 @@ from src.models.plots import *
 from sklearn.cluster import KMeans, AgglomerativeClustering
 
 from src.LLM.data_manager_llm import *
+from src.LLM.api_configuracion import send_llm_request
+
 
 st.set_page_config(
     page_title="Experimentos modelos",
@@ -65,6 +67,7 @@ else:
     df_poblacion = st.session_state.df_poblacion
     df_geo = st.session_state.df_geo
     df_descripcion_comunas = st.session_state.df_descripcion_comunas
+ 
 
 # 3. Dibujar side y filtrar datos
 df_crimesf = DatasetFilterSidebar(df_crimes, st.session_state.deshabilitar_botones_filtros_datos)
@@ -284,13 +287,7 @@ if posFilaSeleccionada != "Sin seleccion de fila" :
     #--------------------------------------------------------------------------------
     #  LLM
 
-
-    # Datos de ejemplo del modelo de clustering (por ejemplo, KMeans)
-   # st.write(posFilaSeleccionada)
-
-    # es improtante crear una copia, ya que si se modifica se altera lat abla dinamica de arriba y se pierde la fila seleccionada.
-
-    
+    # 1)  Organizar JSON para enviar a la API
     dict_results = st.session_state.results[posFilaSeleccionada].copy()
     
     #st.json(dict_results)
@@ -302,14 +299,21 @@ if posFilaSeleccionada != "Sin seleccion de fila" :
     zonas_list_with_clusters = llm_assign_clusters_to_zonas_list(zonas_list, dict_results['Labels'])
 
 
-
-
-    dict_api_llm =  {
+    dict_api_prompt_llm =  {
        "informacion_modelo": dict_model_info  ,
        "resultados_modelo": dict_sklearn_model ,
        "comunas": zonas_list_with_clusters
     }
-    st.write(dict_api_llm)
+
+    json_string_prompt_llm   = json.dumps( dict_api_prompt_llm  , indent=4)
+   # print(json_string)
+    #st.write(dict_api_llm)
+    #st.write(type(dict_api_llm))
+
+
+
+    response_text = send_llm_request(json_string_prompt_llm )
+    st.write(response_text)
 
 
 
