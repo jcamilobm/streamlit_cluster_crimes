@@ -6,11 +6,12 @@ from src.models.model_data_preparation import get_model_data, scale_data
 from src.models.helper import *
 #from src.models.plots import show_model_metrics_table,show_teory_metrics_clustering, show_labels_frequency_table
 from src.models.plots import *
-from sklearn.cluster import KMeans, AgglomerativeClustering
+
 
 from src.LLM.data_manager_llm import *
 from src.LLM.api_configuracion import send_llm_request
 
+from src.utils.config_loader import load_config
 
 st.set_page_config(
     page_title="Experimentos modelos",
@@ -49,7 +50,8 @@ def habilitar_filtros():
     st.session_state.deshabilitar_boton_run_many_experiments = False
     st.session_state.results = []
 
-
+config = load_config() 
+system_prompt = config["llm"]["system_prompt"]
     
 #1. Titulo
 st.markdown("""
@@ -306,18 +308,19 @@ if posFilaSeleccionada != "Sin seleccion de fila" :
     }
 
     json_string_prompt_llm   = json.dumps( dict_api_prompt_llm  , indent=4)
-   # print(json_string)
-    #st.write(dict_api_llm)
-    #st.write(type(dict_api_llm))
+
 
     st.markdown("---")
     st.markdown("### Sugerencias de ejecución")
     if st.button("🤖 Interpretar resultados con IA", type = "primary"):
-        with st.spinner("Cargando respuesta de la API..."):
+        with st.spinner("Cargando respuesta del modelo de lenguaje..."):
             response_text = send_llm_request(json_string_prompt_llm)
         st.write(response_text)
     else:
-        st.write("Presiona el botón para recibir sugerencias de ejecución de un modelo de lenguaje.")
+        with st.expander("Presiona el botón para ver detalles del prompt"):
+            st.write(config["llm"]["system_prompt"])
+            st.json(json_string_prompt_llm)
+
 
 
 

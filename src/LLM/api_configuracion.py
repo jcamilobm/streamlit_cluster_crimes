@@ -55,20 +55,20 @@ def send_llm_request(user_prompt_dinamico, system_prompt=system_prompt,
     ]
     
     # Mostrar un spinner de carga mientras se llama a la API
-    with st.spinner("Cargando respuesta del modelo de lenguaje. Espera un momento por favor"):
-        completion = client.chat.completions.create(
-          extra_headers={
-            "HTTP-Referer": "<YOUR_SITE_URL>",   # Opcional
-            "X-Title": "<YOUR_SITE_NAME>"          # Opcional
-          },
-          extra_body={},
-          model=model,
-          messages=messages,
-          temperature=temperature,
-          top_p=top_p,
-          frequency_penalty=frequency_penalty,
-          presence_penalty=presence_penalty,
-        )
+    #with st.spinner("Cargando respuesta del modelo de lenguaje. Espera un momento por favor"):
+    completion = client.chat.completions.create(
+      extra_headers={
+        "HTTP-Referer": "<YOUR_SITE_URL>",   # Opcional
+        "X-Title": "<YOUR_SITE_NAME>"          # Opcional
+      },
+      extra_body={},
+      model=model,
+      messages=messages,
+      temperature=temperature,
+      top_p=top_p,
+      frequency_penalty=frequency_penalty,
+      presence_penalty=presence_penalty,
+    )
     
     # Retornar el contenido del primer mensaje de la respuesta
     return completion.choices[0].message.content
