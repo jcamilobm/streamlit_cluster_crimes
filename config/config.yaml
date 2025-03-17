@@ -15,6 +15,12 @@ clustering:
 
 
 llm:
+  models:
+    - meta-llama/llama-3.3-70b-instruct:free
+    - deepseek/deepseek-r1-zero:free
+    - nvidia/llama-3.1-nemotron-70b-instruct:free
+    - qwen/qwq-32b:free
+
   system_prompt: |
     Eres un experto en criminología y análisis de datos, especializado en seguridad pública.
     Interpreta los datos de criminalidad de manera que sean fácilmente comprensibles y útiles para los oficiales de policía.
@@ -30,6 +36,8 @@ llm:
     Este nombre debe ser fácil de entender para policías y comandantes, reflejando el tipo de criminalidad predominante en la zona.
 
     Usa un lenguaje claro, sin tecnicismos innecesarios, sé directo, práctico y resume lo que más puedas.
+
+
 
   user_prompt: |
     Los resultados de clustering se presentan en el siguiente formato:

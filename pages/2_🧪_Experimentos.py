@@ -311,13 +311,13 @@ if posFilaSeleccionada != "Sin seleccion de fila" :
 
 
     st.markdown("---")
-    st.markdown("### Sugerencias de ejecución")
+    st.info("Presiona el botón para interpretar los resultados con IA")
     if st.button("🤖 Interpretar resultados con IA", type = "primary"):
         with st.spinner("Cargando respuesta del modelo de lenguaje..."):
             response_text = send_llm_request(json_string_prompt_llm)
         st.write(response_text)
     else:
-        with st.expander("Presiona el botón para ver detalles del prompt"):
+        with st.expander("Despliega para ver detalles del prompt"):
             st.write(config["llm"]["system_prompt"])
             st.json(json_string_prompt_llm)
 
