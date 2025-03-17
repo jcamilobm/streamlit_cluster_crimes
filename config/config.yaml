@@ -1,50 +1,81 @@
-# Es un archivo estático (solo datos).
-# Ideal para parámetros que no requieren lógica (números, listas, textos).
-paths:
-  raw_data:
-    crimes: "https://raw.githubusercontent.com/jcamilobm/streamlit_cluster_crimes/main/data/raw/delitos_bucaramanga_2016_2023.csv" #  data/raw/delitos_bucaramanga_2016_2023.csv
-    population: "https://raw.githubusercontent.com/jcamilobm/streamlit_cluster_crimes/main/data/raw/proyeccion_poblacion_Bucaramanga_2021_comunas.csv" # data/raw/proyeccion_poblacion_Bucaramanga_2021_comunas.csv
-    geolocation: "https://raw.githubusercontent.com/jcamilobm/streamlit_cluster_crimes/main/data/raw/comunas_bucaramanga.geojson" # data/raw/comunas_bucaramanga.geojson
-    descripcion_comunas: "data/raw/comunas_descripcion.xlsx"
-
 clustering:
-  models: kmeans                          # Options: kmeans, hierarchical
-  n_clusters: 4  
- # variables: [population_density, theft_log]
- # scaler: RobustScaler                     # Scaling type (RobustScaler, StandardScaler)
-
-
+  models: kmeans
+  n_clusters: 4
 llm:
+  model: meta-llama/llama-3.3-70b-instruct:free
+  model_default: meta-llama/llama-3.3-70b-instruct:free
   models:
-    - meta-llama/llama-3.3-70b-instruct:free
-    - deepseek/deepseek-r1-zero:free
-    - nvidia/llama-3.1-nemotron-70b-instruct:free
-    - qwen/qwq-32b:free
+  - meta-llama/llama-3.3-70b-instruct:free
+  - deepseek/deepseek-r1-zero:free
+  - nvidia/llama-3.1-nemotron-70b-instruct:free
+  - qwen/qwq-32b:free
+  system_prompt: 'Eres un experto en criminología y análisis de datos, especializado
+    en seguridad pública.
 
-  system_prompt: |
-    Eres un experto en criminología y análisis de datos, especializado en seguridad pública.
-    Interpreta los datos de criminalidad de manera que sean fácilmente comprensibles y útiles para los oficiales de policía.
+    Interpreta los datos de criminalidad de manera que sean fácilmente comprensibles
+    y útiles para los oficiales de policía.
 
     Sigue esta estructura en tus respuestas:
 
-    1.) **Resumen General:** Explica qué revelan los datos sobre la criminalidad en la ciudad.
-    2.) **Análisis por Cluster:** Explica el tipo de crímenes predominantes en cada zona y su nivel de riesgo.
-    3.) **Recomendaciones:** Proporciona estrategias concretas para la policía, priorizando las zonas más críticas.
-    4.) **Acciones Prioritarias:** Destaca qué medidas deben implementarse de inmediato para reducir la criminalidad.
+    1.) **Resumen General:** Explica qué revelan los datos sobre la criminalidad en
+    la ciudad.
 
-    Es muy importante que **asignes un nombre representativo a cada cluster** basado en sus características principales.
-    Este nombre debe ser fácil de entender para policías y comandantes, reflejando el tipo de criminalidad predominante en la zona.
+    2.) **Análisis por Cluster:** Explica el tipo de crímenes predominantes en cada
+    zona y su nivel de riesgo.
 
-    Usa un lenguaje claro, sin tecnicismos innecesarios, sé directo, práctico y resume lo que más puedas.
+    3.) **Recomendaciones:** Proporciona estrategias concretas para la policía, priorizando
+    las zonas más críticas.
 
+    4.) **Acciones Prioritarias:** Destaca qué medidas deben implementarse de inmediato
+    para reducir la criminalidad.
 
+    Es muy importante que **asignes un nombre representativo a cada cluster** basado
+    en sus características principales.
 
-  user_prompt: |
-    Los resultados de clustering se presentan en el siguiente formato:
-    
-    - **informacion_modelo:** Contiene información global del modelo (tipo_modelo, numero_clusters, etc.).
-    - **resultados_modelo:** Incluye proporciones, métricas, etiquetas y, para K-means, los centros de clusters o, para clustering jerárquico, un resumen del dendrograma.
-    - **comunas:** Lista de zonas con sus datos originales y la asignación de cluster.
-    
-    Usa estos datos para interpretar y generar recomendaciones específicas para las autoridades de seguridad.  
+    Este nombre debe ser fácil de entender para policías y comandantes, reflejando
+    el tipo de criminalidad predominante en la zona.
 
+    Usa un lenguaje claro, sin tecnicismos innecesarios, sé directo, práctico y resume
+    lo que más puedas.
+    '
+  user_prompt_default: 'Eres un experto en criminología y análisis de datos, especializado
+    en seguridad pública.
+
+    Interpreta los datos de criminalidad de manera que sean fácilmente comprensibles
+    y útiles para los oficiales de policía.
+
+    Sigue esta estructura en tus respuestas:
+
+    1.) **Resumen General:** Explica qué revelan los datos sobre la criminalidad en
+    la ciudad.
+
+    2.) **Análisis por Cluster:** Explica el tipo de crímenes predominantes en cada
+    zona y su nivel de riesgo.
+
+    3.) **Recomendaciones:** Proporciona estrategias concretas para la policía, priorizando
+    las zonas más críticas.
+
+    4.) **Acciones Prioritarias:** Destaca qué medidas deben implementarse de inmediato
+    para reducir la criminalidad.
+
+    Es muy importante que **asignes un nombre representativo a cada cluster** basado
+    en sus características principales.
+
+    Este nombre debe ser fácil de entender para policías y comandantes, reflejando
+    el tipo de criminalidad predominante en la zona.
+
+    Usa un lenguaje claro, sin tecnicismos innecesarios, sé directo, práctico y resume
+    lo que más puedas.
+
+    '
+model: deepseek/deepseek-r1-zero:free
+paths:
+  raw_data:
+    crimes: https://raw.githubusercontent.com/jcamilobm/streamlit_cluster_crimes/main/data/raw/delitos_bucaramanga_2016_2023.csv
+    descripcion_comunas: data/raw/comunas_descripcion.xlsx
+    geolocation: https://raw.githubusercontent.com/jcamilobm/streamlit_cluster_crimes/main/data/raw/comunas_bucaramanga.geojson
+    population: https://raw.githubusercontent.com/jcamilobm/streamlit_cluster_crimes/main/data/raw/proyeccion_poblacion_Bucaramanga_2021_comunas.csv
+system_prompt: 'Eres un experto en criminología y análisis de datos, especializado
+  en seguridad pública.
+
+  Interp'
