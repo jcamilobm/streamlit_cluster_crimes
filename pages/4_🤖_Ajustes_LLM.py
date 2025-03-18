@@ -8,12 +8,15 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-def configuracion_llm(models_llm, system_prompt):
+def configuracion_llm(models_llm, system_prompt, modelo_actual):
     st.title("Ajustes LLM")
     st.info('Elige un modelo de lenguaje y modifica el prompt para utilizar en la página de Inicio.', icon="ℹ️")
 
+    # Indicador visual del modelo actual
+    st.info(f"**Modelo actual:** `{modelo_actual}`", icon="🤖")
+
     modelo_llm_new = st.selectbox("Selecciona el modelo de LLM", models_llm)
-    system_prompt_new = st.text_area("Prompt del usuario", system_prompt , height=  420)
+    system_prompt_new = st.text_area("Prompt del usuario", system_prompt, height=420)
 
     return modelo_llm_new, system_prompt_new
 
@@ -24,19 +27,20 @@ if "config" not in st.session_state:
 config = st.session_state.config
 models_llm = config["llm"]["models"]
 system_prompt = config["llm"]["system_prompt"]
+modelo_actual = config["llm"]["model"]  # Modelo actualmente cargado
 
-modelo_llm_new, system_prompt_new = configuracion_llm(models_llm, system_prompt)
+modelo_llm_new, system_prompt_new = configuracion_llm(models_llm, system_prompt, modelo_actual)
 
-# Botón para guardar configuración
+# Botones para guardar configuración
 col1, col2 = st.columns(2)
 
 with col1:
     if st.button("✅ Guardar Configuración", type="primary"):
         update_config("llm.model", modelo_llm_new)
         update_config("llm.system_prompt", system_prompt_new)
-        
+
         st.session_state.config = load_config()
-        
+
         st.success("Configuración guardada exitosamente.")
         st.rerun()
 
@@ -47,9 +51,8 @@ with col2:
 
         update_config("llm.model", models_llm_default)
         update_config("llm.system_prompt", system_prompt_default)
-        
+
         st.session_state.config = load_config()
 
         st.success("Restablecimiento exitoso.")
         st.rerun()
-

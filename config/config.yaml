@@ -2,13 +2,14 @@ clustering:
   models: kmeans
   n_clusters: 4
 llm:
-  model: deepseek/deepseek-r1-zero:free
+  model: deepseek/deepseek-r1-distill-llama-70b:free # Modelo de lenguaje utilizado para la interpretación
   model_default: meta-llama/llama-3.3-70b-instruct:free
+  temperature: 0.2 # Baja temperatura para respuestas precisas y consistentes
   models:
   - meta-llama/llama-3.3-70b-instruct:free
-  - deepseek/deepseek-r1-zero:free
+  - deepseek/deepseek-r1-distill-llama-70b:free
   - nvidia/llama-3.1-nemotron-70b-instruct:free
-  - qwen/qwq-32b:free
+  - sophosympatheia/rogue-rose-103b-v0.2:free
   system_prompt: 'Eres un experto en criminología y análisis de datos, especializado
     en seguridad pública.
 

@@ -14,6 +14,7 @@ api_key_llm = os.getenv("API_KEY")
 config = load_config() 
 system_prompt = config["llm"]["system_prompt"]
 model = config["llm"]["model"]
+temperature = config["llm"]["temperature"] 
 
 import streamlit as st
 import json
@@ -22,7 +23,7 @@ from openai import OpenAI  # Asegúrate de tener la importación correcta para O
 
 def send_llm_request(user_prompt_dinamico, system_prompt = system_prompt, 
                      model= model ,
-                     temperature=0.3, top_p=0.8, 
+                     temperature = temperature, top_p=0.8, 
                      frequency_penalty=0.5, presence_penalty=0.3):
     """
     Envía una solicitud a la API (OpenRouter) usando el modelo especificado y devuelve la respuesta generada.
