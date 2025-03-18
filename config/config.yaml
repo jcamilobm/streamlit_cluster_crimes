@@ -2,7 +2,7 @@ clustering:
   models: kmeans
   n_clusters: 4
 llm:
-  model: meta-llama/llama-3.3-70b-instruct:free
+  model: deepseek/deepseek-r1-zero:free
   model_default: meta-llama/llama-3.3-70b-instruct:free
   models:
   - meta-llama/llama-3.3-70b-instruct:free
@@ -37,6 +37,7 @@ llm:
 
     Usa un lenguaje claro, sin tecnicismos innecesarios, sé directo, práctico y resume
     lo que más puedas.
+
     '
   user_prompt_default: 'Eres un experto en criminología y análisis de datos, especializado
     en seguridad pública.
@@ -75,7 +76,3 @@ paths:
     descripcion_comunas: data/raw/comunas_descripcion.xlsx
     geolocation: https://raw.githubusercontent.com/jcamilobm/streamlit_cluster_crimes/main/data/raw/comunas_bucaramanga.geojson
     population: https://raw.githubusercontent.com/jcamilobm/streamlit_cluster_crimes/main/data/raw/proyeccion_poblacion_Bucaramanga_2021_comunas.csv
-system_prompt: 'Eres un experto en criminología y análisis de datos, especializado
-  en seguridad pública.
-
-  Interp'

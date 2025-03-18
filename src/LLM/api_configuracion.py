@@ -13,15 +13,15 @@ api_key_llm = os.getenv("API_KEY")
 
 config = load_config() 
 system_prompt = config["llm"]["system_prompt"]
-
+model = config["llm"]["model"]
 
 import streamlit as st
 import json
 from openai import OpenAI  # Asegúrate de tener la importación correcta para OpenRouter
 # Asegúrate de tener definida la variable `config` en el contexto de tu aplicación.
 
-def send_llm_request(user_prompt_dinamico, system_prompt=system_prompt, 
-                     model="meta-llama/llama-3.3-70b-instruct:free",
+def send_llm_request(user_prompt_dinamico, system_prompt = system_prompt, 
+                     model= model ,
                      temperature=0.3, top_p=0.8, 
                      frequency_penalty=0.5, presence_penalty=0.3):
     """

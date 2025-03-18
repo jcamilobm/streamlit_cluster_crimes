@@ -228,15 +228,6 @@ if st.session_state.results:
    # validar si devuelve un dataframe para evitar error
     if isinstance(selected_rows, pd.DataFrame):
        posFilaSeleccionada = int(selected_rows.index[0])
-       st.write(posFilaSeleccionada)
-        
-   ##     st.write(st.session_state.results)
-   ##     st.write(selected_rows)
-   
-   # if isinstance(selected_rows, pd.DataFrame) and not selected_rows.empty:
-        # En lugar de usar el índice del DataFrame reindexado, lee el valor de la columna 'experiment_id'
-    #    posFilaSeleccionada = selected_rows["experiment_id"].iloc[0]
-    #    st.write("El experiment_id seleccionado es:", posFilaSeleccionada)
    
    
 # Mostrar informacion teorica de como interpretar las emtricas encontradas
@@ -311,14 +302,19 @@ if posFilaSeleccionada != "Sin seleccion de fila" :
 
 
     st.markdown("---")
-    st.info("Presiona el botón para interpretar los resultados con IA")
-    if st.button("🤖 Interpretar resultados con IA", type = "primary"):
+
+    # Mensaje dinámico indicando el modelo cargado actualmente
+    modelo_llm_actual = config["llm"]["model"]
+    help_text = f"Modelo actual cargado: {modelo_llm_actual}"
+
+    if st.button("🤖 Interpretar resultados con IA", type="primary", help=help_text):
         with st.spinner("Cargando respuesta del modelo de lenguaje..."):
             response_text = send_llm_request(json_string_prompt_llm)
         st.write(response_text)
     else:
         with st.expander("Despliega para ver detalles del prompt"):
-            st.write(config["llm"]["system_prompt"])
+            st.write(f"**Modelo lenguaje:** {modelo_llm_actual}")
+            st.write(f"**Prompt del sistema:** {config['llm']['system_prompt']}")
             st.json(json_string_prompt_llm)
 
 
