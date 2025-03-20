@@ -2,6 +2,7 @@ clustering:
   models: kmeans
   n_clusters: 4
 llm:
+  base_url: "https://openrouter.ai/api/v1"  # api proveedor
   model: deepseek/deepseek-r1-distill-llama-70b:free
   model_default: meta-llama/llama-3.3-70b-instruct:free
   models:
@@ -9,6 +10,7 @@ llm:
   - deepseek/deepseek-r1-distill-llama-70b:free
   - nvidia/llama-3.1-nemotron-70b-instruct:free
   - sophosympatheia/rogue-rose-103b-v0.2:free
+  temperature: 0.2
   system_prompt: 'Eres un experto en criminología y análisis de datos, especializado
     en seguridad pública.
 
@@ -39,7 +41,7 @@ llm:
     lo que más puedas.
 
     '
-  temperature: 0.2
+
   user_prompt_default: 'Eres un experto en criminología y análisis de datos, especializado
     en seguridad pública.
 
