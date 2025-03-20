@@ -4,9 +4,8 @@ from src.EDA.data_manager import load_all_data_and_clean
 from src.components.DatasetFilterSidebar import DatasetFilterSidebar
 from src.models.model_data_preparation import get_model_data, scale_data
 from src.models.helper import *
-#from src.models.plots import show_model_metrics_table,show_teory_metrics_clustering, show_labels_frequency_table
 from src.models.plots import *
-
+from src.components.HelpUser import *
 
 from src.LLM.data_manager_llm import *
 from src.LLM.api_configuracion import send_llm_request
@@ -79,6 +78,10 @@ df_crimesf = DatasetFilterSidebar(df_crimes, st.session_state.deshabilitar_boton
 
 df_model , df_identifiers = get_model_data(df_crimesf, df_poblacion , df_geo)
 df_model  = calcular_RME(df_model , solo_rme=False)
+
+
+
+show_guia_experimentacion(expandir=True)
 
 with st.expander("Ver Datos completos pivoteados"):
     df_concatenado = pd.concat([ df_identifiers, df_model], axis=1)
@@ -223,11 +226,12 @@ if st.session_state.results:
     response = show_model_metrics_table(df_norm)
     #response = show_table_with_preselected_row(df_norm, preselect_index=0)
     selected_rows = response.selected_rows
-    st.write(selected_rows)
+    
   
    # validar si devuelve un dataframe para evitar error
     if isinstance(selected_rows, pd.DataFrame):
        posFilaSeleccionada = int(selected_rows.index[0])
+       st.write(selected_rows)
    
    
 # Mostrar informacion teorica de como interpretar las emtricas encontradas
@@ -307,16 +311,15 @@ if posFilaSeleccionada != "Sin seleccion de fila" :
     modelo_llm_actual = config["llm"]["model"]
     help_text = f"Modelo actual cargado: {modelo_llm_actual}"
 
-    if st.button("🤖 Interpretar resultados con IA", type="primary", help=help_text):
-        with st.spinner("Cargando respuesta del modelo de lenguaje..."):
-            response_text = send_llm_request(json_string_prompt_llm)
-        st.write(response_text)
-    else:
-        with st.expander("Despliega para ver detalles del prompt"):
+    with st.expander("Despliega para ver detalles del prompt"):
             st.write(f"**Modelo lenguaje:** {modelo_llm_actual}")
             st.write(f"**Prompt del sistema:** {config['llm']['system_prompt']}")
             st.json(json_string_prompt_llm)
 
+    if st.button("🤖 Interpretar resultados con IA", type="primary", help=help_text):
+        with st.spinner("Cargando respuesta del modelo de lenguaje..."):
+            response_text = send_llm_request(json_string_prompt_llm)
+            st.write(response_text)
 
 
 
