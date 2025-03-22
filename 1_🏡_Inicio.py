@@ -260,7 +260,7 @@ if posFilaSeleccionada != "Sin seleccion de fila" :
     ### Modelo Seleccionado
     - **Modelo:** {modelo}  
     - **Número de Clusters:** {n_clusters}
-    - **Escala:** {escala}.  Si escogio RME, la ya no aplica a las categorias de crimenes.
+    - **Escala:** {escala}.  Si escogió RME, la ya no aplica a las categorias de crimenes.
     - **Metodo de Distancia:** {distancia}
     - **Metrica Silueta:** {metric_silueta}
     """)

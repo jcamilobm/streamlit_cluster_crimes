@@ -35,7 +35,7 @@ def send_llm_request(
     # Cargar configuración si faltan parámetros
     config = load_config()
     system_prompt = system_prompt or config.get("llm", {}).get("system_prompt", "Eres un asistente de IA.")
-    model = model or config.get("llm", {}).get("model", "gpt-4")
+    model = model or config.get("llm", {}).get("model", "meta-llama/llama-3.3-70b-instruct:free")
     temperature = temperature if temperature is not None else config.get("llm", {}).get("temperature", 0.7)
     base_url = base_url or config.get("llm", {}).get("base_url", "https://openrouter.ai/api/v1")
     api_key_llm = api_key_llm or os.getenv("API_KEY")
@@ -75,3 +75,18 @@ def send_llm_request(
 
     except Exception as e:
         return f"❌ Error al conectar con el modelo: {str(e)}"
+
+
+
+# send_llm_request("Analiza la comuna 3")
+# Usa modelo, prompt, temperatura, etc. desde la configuración
+
+
+# o mayor control:
+
+# send_llm_request(
+ #   user_prompt_dinamico="Analiza la comuna 3",
+ #   model="gpt-4-turbo",
+  #  temperature=0.3,
+   # api_key_llm="sk-mi-clave-personal"
+#)
