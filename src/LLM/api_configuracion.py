@@ -1,61 +1,63 @@
 import os
-import json
-import streamlit as st
 from dotenv import load_dotenv
-from openai import OpenAI  # Cliente OpenRouter
+from openai import OpenAI
 from src.utils.config_loader import load_config
 
-# Cargar variables de entorno desde .env
+# Cargar variables de entorno desde `.env`
 load_dotenv()
 
-# Obtener credenciales desde .env
-api_key_llm = os.getenv("API_KEY")
-
-# Cargar configuración desde YAML
-config = load_config()
-
-# Configuración de parámetros LLM
-system_prompt = config.get("llm", {}).get("system_prompt", "Eres un asistente de IA.")
-model = config.get("llm", {}).get("model", "gpt-4")
-temperature = config.get("llm", {}).get("temperature", 0.7)
-base_url = config.get("llm", {}).get("base_url", "https://openrouter.ai/api/v1")  # Permite compatibilidad con otros proveedores
-
-
-def send_llm_request(user_prompt_dinamico, system_prompt=system_prompt,
-                     model=model, temperature=temperature, top_p=0.8, 
-                     frequency_penalty=0.5, presence_penalty=0.3):
+def send_llm_request(
+    user_prompt_dinamico: str,
+    system_prompt: str = None,
+    model: str = None,
+    api_key_llm: str = None,
+    base_url: str = None,
+    temperature: float = None,
+    top_p: float = 0.8,
+    frequency_penalty: float = 0.5,
+    presence_penalty: float = 0.3
+) -> str:
     """
-    Envía una solicitud a la API OpenRouter (u otro proveedor) usando el modelo especificado y devuelve la respuesta generada.
+    Envía una solicitud a un modelo LLM vía API (como OpenRouter) con configuración flexible.
 
     Parámetros:
-      system_prompt (str): Instrucciones del sistema que configuran el comportamiento del LLM.
-      user_prompt_dinamico (str): Mensaje dinámico del usuario, que puede incluir instrucciones adicionales o datos.
-      model (str): Identificador del modelo a utilizar.
-      temperature (float): Controla la creatividad de la respuesta.
-      top_p (float): Probabilidad acumulada para la generación de tokens.
-      frequency_penalty (float): Penaliza la repetición de palabras.
-      presence_penalty (float): Penaliza la repetición de temas.
-      
+      user_prompt_dinamico (str): Entrada del usuario a concatenar al prompt base.
+      system_prompt (str): Prompt del sistema. Se carga de config si no se pasa.
+      model (str): Modelo LLM a usar. Se carga de config si no se pasa.
+      api_key_llm (str): Clave de API. Se carga de .env si no se pasa.
+      base_url (str): URL base del proveedor. Se carga de config si no se pasa.
+      temperature, top_p, frequency_penalty, presence_penalty: Parámetros de control del LLM.
+
     Retorna:
-      str: El contenido del mensaje de la respuesta generada por el LLM.
+      str: Respuesta del modelo.
     """
-    # Concatenar el prompt del usuario a partir del config y el prompt dinámico
-    user_prompt = config.get("llm", {}).get("user_prompt", "") + "\n\n" + user_prompt_dinamico
+
+    # Cargar configuración si faltan parámetros
+    config = load_config()
+    system_prompt = system_prompt or config.get("llm", {}).get("system_prompt", "Eres un asistente de IA.")
+    model = model or config.get("llm", {}).get("model", "gpt-4")
+    temperature = temperature if temperature is not None else config.get("llm", {}).get("temperature", 0.7)
+    base_url = base_url or config.get("llm", {}).get("base_url", "https://openrouter.ai/api/v1")
+    api_key_llm = api_key_llm or os.getenv("API_KEY")
+
+    if not api_key_llm:
+        return "❌ Error: No se encontró una API Key válida."
+
+    # Construir el prompt final
+    user_prompt_base = config.get("llm", {}).get("user_prompt", "")
+    user_prompt = f"{user_prompt_base}\n\n{user_prompt_dinamico}".strip()
 
     try:
-        # Instanciar el cliente OpenAI (compatible con OpenRouter u otros)
         client = OpenAI(
-            base_url=base_url,  # Permite cambiar de proveedor fácilmente
+            base_url=base_url,
             api_key=api_key_llm
         )
 
-        # Construir los mensajes de la conversación
         messages = [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt}
         ]
 
-        # Llamada a la API con manejo de cabeceras personalizadas
         completion = client.chat.completions.create(
             model=model,
             messages=messages,
@@ -64,18 +66,12 @@ def send_llm_request(user_prompt_dinamico, system_prompt=system_prompt,
             frequency_penalty=frequency_penalty,
             presence_penalty=presence_penalty,
             extra_headers={
-                "HTTP-Referer": "<YOUR_SITE_URL>",  # Opcional
-                "X-Title": "<YOUR_SITE_NAME>"       # Opcional
+                "HTTP-Referer": "<YOUR_SITE_URL>",
+                "X-Title": "<YOUR_SITE_NAME>"
             }
         )
 
-        # Retornar el contenido del primer mensaje de la respuesta
         return completion.choices[0].message.content
 
     except Exception as e:
-        return f"❌ Error al conectar con la API: {str(e)}"
-
-
-# Ejemplo de uso en Streamlit:
-# response_text = send_llm_request(user_prompt_dinamico)
-# st.write(response_text)
+        return f"❌ Error al conectar con el modelo: {str(e)}"

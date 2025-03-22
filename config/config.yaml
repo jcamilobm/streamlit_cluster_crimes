@@ -3,7 +3,7 @@ clustering:
   n_clusters: 4
 llm:
   base_url: https://openrouter.ai/api/v1
-  model: meta-llama/llama-3.3-70b-instruct:free
+  model: sophosympatheia/rogue-rose-103b-v0.2:free
   model_default: meta-llama/llama-3.3-70b-instruct:free
   models:
   - meta-llama/llama-3.3-70b-instruct:free
@@ -71,7 +71,6 @@ llm:
     lo que más puedas.
 
     '
-model: deepseek/deepseek-r1-zero:free
 paths:
   raw_data:
     crimes: https://raw.githubusercontent.com/jcamilobm/streamlit_cluster_crimes/main/data/raw/delitos_bucaramanga_2016_2023.csv

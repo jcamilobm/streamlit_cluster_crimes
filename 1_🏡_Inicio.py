@@ -51,7 +51,9 @@ def habilitar_filtros():
 
 config = load_config() 
 system_prompt = config["llm"]["system_prompt"]
-    
+model_llm = config["llm"]["model"]    
+
+
 #1. Titulo
 st.markdown("""
 # ⚔️ **K-means vs. Jerárquico**  
@@ -308,12 +310,12 @@ if posFilaSeleccionada != "Sin seleccion de fila" :
     st.markdown("---")
 
     # Mensaje dinámico indicando el modelo cargado actualmente
-    modelo_llm_actual = config["llm"]["model"]
-    help_text = f"Modelo actual cargado: {modelo_llm_actual}"
+    
+    help_text = f"Modelo actual cargado: {model_llm}"
 
     with st.expander("Despliega para ver detalles del prompt"):
-            st.write(f"**Modelo lenguaje:** {modelo_llm_actual}")
-            st.write(f"**Prompt del sistema:** {config['llm']['system_prompt']}")
+            st.write(f"**Modelo lenguaje:** {model_llm}")
+            st.write(f"**Prompt del sistema:** {system_prompt}")
             st.json(json_string_prompt_llm)
 
     if st.button("🤖 Interpretar resultados con IA", type="primary", help=help_text):
