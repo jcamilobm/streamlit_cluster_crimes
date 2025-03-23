@@ -10,8 +10,4 @@ st.set_page_config(
 st.info('Revisa el alcance de la App', icon="ℹ️")
 
 
-import streamlit as st
-
-st.write("Contenido de st.secrets:", dict(st.secrets))
-
 

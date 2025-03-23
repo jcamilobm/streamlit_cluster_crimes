@@ -4,8 +4,8 @@ from openai import OpenAI
 from src.utils.config_loader import load_config
 from src.utils.secrets import get_secret
 import streamlit as st
-# Cargar variables de entorno desde `.env`
-load_dotenv()
+
+
 
 def send_llm_request(
     user_prompt_dinamico: str,
@@ -42,6 +42,8 @@ def send_llm_request(
 
 
     api_key_llm = api_key_llm or  get_secret("API_KEY")
+    
+    st.write("Contenido de st.secrets:", dict(st.secrets))
 
     if not api_key_llm:
         return "❌ Error: No se encontró una API Key válida."
