@@ -1,8 +1,5 @@
 import streamlit as st
 
-from src.EDA.util import *
-
-
 st.set_page_config(
     page_title="Ayuda",
     page_icon="❓",
