@@ -2,7 +2,8 @@ import os
 from dotenv import load_dotenv
 from openai import OpenAI
 from src.utils.config_loader import load_config
-
+from src.utils.secrets import get_secret
+import streamlit as st
 # Cargar variables de entorno desde `.env`
 load_dotenv()
 
@@ -38,7 +39,9 @@ def send_llm_request(
     model = model or config.get("llm", {}).get("model", "meta-llama/llama-3.3-70b-instruct:free")
     temperature = temperature if temperature is not None else config.get("llm", {}).get("temperature", 0.7)
     base_url = base_url or config.get("llm", {}).get("base_url", "https://openrouter.ai/api/v1")
-    api_key_llm = api_key_llm or os.getenv("API_KEY")
+
+
+    api_key_llm = api_key_llm or  get_secret("API_KEY")
 
     if not api_key_llm:
         return "❌ Error: No se encontró una API Key válida."

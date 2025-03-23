@@ -8,6 +8,9 @@ env/
 venv/
 *.env
 
+# Ignore Streamlit secrets
+.streamlit/secrets.toml
+
 # Archivos generados por Streamlit
 .cache/
 
