@@ -42,8 +42,6 @@ def send_llm_request(
 
 
     api_key_llm = api_key_llm or  get_secret("API_KEY")
-    
-    st.write("Contenido de st.secrets:", dict(st.secrets))
 
     if not api_key_llm:
         return "❌ Error: No se encontró una API Key válida."
