@@ -20,4 +20,5 @@ def load_data(file_path, dtypes=None):
         return gpd.read_file(file_path)
     else:
         raise ValueError("Formato no soportado. Usa un archivo CSV o GeoJSON.")
+    
 
