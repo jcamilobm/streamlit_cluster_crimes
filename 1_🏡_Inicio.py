@@ -83,11 +83,10 @@ else:
 df_crimesf = DatasetFilterSidebar(df_crimes, st.session_state.deshabilitar_botones_filtros_datos)
 
 
-# Obtener tabla para los modelos de machine learning
+# 4) Obtener tabla para los modelos de machine learning
 
 df_model , df_identifiers = get_model_data(df_crimesf, df_poblacion , df_geo)
 df_model  = calcular_RME(df_model , solo_rme=False)
-
 
 
 show_guia_experimentacion(expandir=True)
@@ -154,10 +153,12 @@ lista_concatenada = opciones_crimenes_seleccionada + opciones_restantes_selecion
 # filtrar el modelo
 df_model  = df_model[lista_concatenada]
 
-df_model_scaled = scale_data(df_model, 'RobustScaler')
+#df_model_scaled = scale_data(df_model, 'RobustScaler')
+with st.expander("Ver tabla inicial para el modelo"):
+    df_concatenado = pd.concat([ df_identifiers, df_model], axis=1)
+    st.dataframe(df_concatenado)
 
-
-plot_heatmap(df_model_scaled)
+plot_heatmap(df_model)
 
 
 st.markdown("---")
@@ -198,7 +199,7 @@ with col4:
 
 
 # Aplicar el escalado seleccionado
-#df_model_scaled = scale_data(df_model, scaling_method)
+df_model_scaled = scale_data(df_model, scaling_method)
 
 with st.expander("Ver tabla para el modelo escalada"):
     st.dataframe(df_model_scaled)
