@@ -1,5 +1,6 @@
 import streamlit as st
 from src.utils.config_loader import load_config, update_config
+import pandas as pd
 
 st.set_page_config(
     page_title="Ajustes LLM",
@@ -56,3 +57,37 @@ with col2:
 
         st.success("Restablecimiento exitoso.")
         st.rerun()
+
+
+
+
+####################
+
+
+# App Streamlit
+st.markdown("---")
+# Verifica si ya está en session_state; si no, lo carga
+if 'df_descripcion_comunas' not in st.session_state:
+    descripcion_comunas_path = "data/raw/comunas_descripcion.xlsx"
+    st.session_state.df_descripcion_comunas =  pd.read_excel(descripcion_comunas_path, sheet_name="descripciones_comunas")
+
+
+
+st.subheader("Editor de descripciones por comuna ")
+# Obtener la copia editable desde session_state
+df = st.session_state.df_descripcion_comunas
+# Selección de comuna
+comuna = st.selectbox("Selecciona la comuna", df['comuna'])
+
+# Mostrar y editar descripción
+descripcion_actual = df.loc[df['comuna'] == comuna, 'descripcion'].values[0]
+descripcion_editada = st.text_area("Editar descripción", descripcion_actual, height=150)
+
+# Aplicar cambio solo en memoria (session_state)
+if st.button("Aplicar cambio",type="primary"):
+    df.loc[df['comuna'] == comuna, 'descripcion'] = descripcion_editada
+    st.success(f"Descripción actualizada en esta sesión para la comuna: {comuna}")
+
+# Mostrar tabla completa actualizada (solo para el usuario)
+st.subheader("Vista previa descripciones comunas:")
+st.dataframe(df, use_container_width=True)
