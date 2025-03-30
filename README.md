@@ -19,7 +19,7 @@
 
 Visita la App en [our website](https://appclustercrimes-hps7f8ushwdyf2bvx9b6k8.streamlit.app/)
 
-[![YouTube](http://i.ytimg.com/vi/mgQn8upQSk8/hqdefault.jpg)](https://www.youtube.com/watch?v=mgQn8upQSk8)
+![Tweet Generator](assets/demo_app_cluster_crimen.gif)
 
 ## 📚 Documentación
 
