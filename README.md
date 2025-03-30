@@ -26,30 +26,30 @@ Visita nuestra documentación [here](https://google.com)
 
 ## 📑 Tabla de contenido
 
-- [Introducción](#-introduccion)
-- [Arquitectura](#-arquitectura)
+- [Introducción](#introduccion)
+- [Estructura de carpetas](#estructura-de-carpetas)
 
 ---
 
-## - Introducción
+## Introducción
 
 En **Clustering por Comunas en Bucaramanga** se utiliza la inteligencia de dos modelos de clustering (k-means y jerárquico) para agrupar datos de crímenes reportados en la ciudad. La aplicación se centra en:
 - Analizar datos de incidentes delictivos.
 - Visualizar clusters en un mapa interactivo.
 - Ofrecer información relevante para autoridades y ciudadanos.
-- Assitencia con LLM para insights
+- Asistencia con LLM para insights
 
 Esta herramienta ayuda a identificar patrones delictivos, permitiendo focalizar estrategias de prevención y optimización de recursos en las comunas con mayor incidencia.
 
 ---
 
-## - Arquitectura
+## Estructura de carpetas
 
 La arquitectura del proyecto se compone de los siguientes módulos:
 
-- **EDA:** Recopilación y preprocesamiento de datos de Datos Abiertos Colombia
-- **models:** preparacion de datos apra modelos de machine learning supervisado(k-means y jerarquico).
+- **EDA:** Recopilación y preprocesamiento de datos de Datos Abiertos Colombia.
+- **models:** Preparación de datos para modelos de machine learning supervisado (k-means y jerárquico).
 - **notebook:** Resumen de limpieza de datos.
-- **LLM:** Consumo de API modelos de lenguaje para generar insight de los resultados de clustering.
-- **utils** Carga de de config.yaml
+- **LLM:** Consumo de API de modelos de lenguaje para generar insights a partir de los resultados del clustering.
+- **utils:** Carga de `config.yaml`.
 ---
