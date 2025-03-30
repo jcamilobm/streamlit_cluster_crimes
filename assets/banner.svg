@@ -1,0 +1,39 @@
+<svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fondo oscuro -->
+  <rect width="800" height="300" fill="#1a1a1a"/>
+  
+  <!-- Título principal -->
+  <text x="50%" y="80" font-size="60" text-anchor="middle" fill="#FF073A" font-family="Impact, sans-serif">
+    CRÍMENES
+  </text>
+  
+  <!-- Subtítulo -->
+  <text x="50%" y="140" font-size="36" text-anchor="middle" fill="#FFFFFF" font-family="Arial, sans-serif">
+    Clustering Bucaramanga
+  </text>
+  
+  <!-- Representación de clusters: nodos conectados -->
+  <!-- Primer cluster -->
+  <circle cx="150" cy="220" r="20" fill="#2ECC71" />
+  <circle cx="200" cy="220" r="20" fill="#3498DB" />
+  <circle cx="175" cy="260" r="20" fill="#9B59B6" />
+  <line x1="150" y1="220" x2="200" y2="220" stroke="#FFFFFF" stroke-width="3"/>
+  <line x1="175" y1="220" x2="175" y2="260" stroke="#FFFFFF" stroke-width="3"/>
+  
+  <!-- Segundo cluster -->
+  <circle cx="350" cy="220" r="20" fill="#F1C40F" />
+  <circle cx="400" cy="220" r="20" fill="#E67E22" />
+  <circle cx="375" cy="260" r="20" fill="#E74C3C" />
+  <line x1="350" y1="220" x2="400" y2="220" stroke="#FFFFFF" stroke-width="3"/>
+  <line x1="375" y1="220" x2="375" y2="260" stroke="#FFFFFF" stroke-width="3"/>
+  
+  <!-- Línea divisoria para separar clusters y skyline -->
+  <line x1="450" y1="160" x2="450" y2="300" stroke="#FF073A" stroke-width="4"/>
+  
+  <!-- Skyline estilizado (representación simple de edificios de Bucaramanga) -->
+  <g fill="#2e2e2e">
+    <rect x="500" y="180" width="40" height="120"/>
+    <rect x="550" y="150" width="50" height="150"/>
+    <rect x="620" y="200" width="30" height="100"/>
+  </g>
+</svg>
