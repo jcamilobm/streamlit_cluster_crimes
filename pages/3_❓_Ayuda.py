@@ -61,7 +61,7 @@ Bienvenido a la aplicación de análisis de agrupamiento de comunas de Bucaraman
 - **Personalización del Asistente (Ajustes LLM):**
   - Accede a la página de ajustes para modificar el prompt del asistente.
   - Configura el **contexto** y la **metodología** que se desea aplicar en el análisis.
-  - Selecciona el **modelo LLM** a utilizar (por ejemplo, GPT-4 u otro disponible).
+  - Selecciona el **modelo LLM** a utilizar.
   - Ingresa o revisa las **descripciones de las 17 comunas** para asegurar que el asistente tenga la información necesaria para contextualizar los resultados.
 
 ---
