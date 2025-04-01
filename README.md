@@ -34,6 +34,7 @@ Visita nuestra documentación [here](https://google.com)
 
 - [Introducción](#introduccion)
 - [Estructura de carpetas](#estructura-de-carpetas)
+- [Flujograma](#flujograma)
 
 ---
 
@@ -51,11 +52,18 @@ Esta herramienta ayuda a identificar patrones delictivos, permitiendo focalizar 
 
 ## Estructura de carpetas
 
-La arquitectura del proyecto se compone de los siguientes módulos:
+El proyecto se compone de los siguientes módulos:
 
 - **EDA:** Recopilación y preprocesamiento de datos de Datos Abiertos Colombia.
 - **models:** Preparación de datos para modelos de machine learning supervisado (k-means y jerárquico).
 - **notebook:** Resumen de limpieza de datos.
 - **LLM:** Consumo de API de modelos de lenguaje para generar insights a partir de los resultados del clustering.
 - **utils:** Carga de `config.yaml`.
+---
+
+## Flujograma
+
+En resumen sigue la siguiente secuencia de ejecucion:
+
+![flujograma-app](assets/flujograma_app.png)
 ---
