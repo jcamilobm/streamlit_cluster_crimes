@@ -21,6 +21,10 @@ Visita la App en [our website](https://appclustercrimes-hps7f8ushwdyf2bvx9b6k8.s
 
 ![Tweet Generator](assets/demo_app_cluster_crimen_1.gif)
 
+Puedes generar insight con ayuda de IA:
+
+![Tweet Generator](assets/demo_app_cluster_crimen_2_llm.gif)
+
 ## 📚 Documentación
 
 Visita nuestra documentación [here](https://google.com)
