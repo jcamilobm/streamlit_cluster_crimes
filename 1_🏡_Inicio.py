@@ -224,7 +224,7 @@ if reset_results:
 posFilaSeleccionada = "Sin seleccion de fila"
 
 if st.session_state.results:
-    st.subheader('📊 Resultados Comparativos')
+    #st.subheader('📊 Resultados Comparativos')
 
     results_df = pd.DataFrame(st.session_state.results).copy()
     results_df['Inercia'] = pd.to_numeric(results_df['Inercia'], errors='coerce')
@@ -232,7 +232,27 @@ if st.session_state.results:
 
     # Calcular el score global con normalización ponderada
     df_norm = calculate_score_normalizado(results_df)
- 
+   
+    # Convertir el dataframe a CSV
+    csv_norm = df_norm.to_csv(index=False).encode('utf-8')
+
+    # Crear dos columnas con proporciones 3:1
+    col1, col2 = st.columns([3, 1])
+
+    # En la primera columna se muestra el subheader
+    col1.subheader('📊 Resultados Comparativos')
+
+    # En la segunda columna se coloca el botón de descarga
+    col2.download_button(
+        label="Descargar Exp. 📥",
+        data=csv_norm,
+        file_name='df_norm.csv',
+        mime='text/csv'
+    )
+
+    ####
+
+
     response = show_model_metrics_table(df_norm)
     #response = show_table_with_preselected_row(df_norm, preselect_index=0)
     selected_rows = response.selected_rows
@@ -244,7 +264,7 @@ if st.session_state.results:
        st.write(selected_rows)
    
    
-# Mostrar informacion teorica de como interpretar las emtricas encontradas
+# Mostrar informacion teorica de como interpretar las metricas encontradas
 show_teory_metrics_clustering()
 
 
@@ -262,6 +282,17 @@ if posFilaSeleccionada != "Sin seleccion de fila" :
      
     metric_silueta = st.session_state.results[posFilaSeleccionada]['Silhouette Score']
     #metric_inercia = st.session_state.results[posFilaSeleccionada]['Labels']
+
+    # new: 06/04/2025
+    #st.dataframe(df_identifiers)
+    #st.dataframe(labels)
+    #st.dataframe(df_crimes)
+    df_pivot_with_labels = pd.concat([ df_identifiers , pd.Series(labels,name="cluster")],axis=1)
+    #st.dataframe(df_pivot_with_labels)
+    df_crimes_cluster = df_pivot_with_labels.merge(df_crimesf, on="num_com", how="inner")
+    #st.dataframe(df_crimes_cluster
+
+    # end 06/04/2025
 
     st.markdown("---")
     st.markdown(f"""
@@ -286,10 +317,7 @@ if posFilaSeleccionada != "Sin seleccion de fila" :
             plot_dendrogram_jerarquico(df_model, n_clusters)
 
 
-    
-
-
-
+    display_all_grouped_bar_charts(df_crimes_cluster)
 
     #--------------------------------------------------------------------------------
     #  LLM

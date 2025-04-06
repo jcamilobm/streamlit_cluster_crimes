@@ -315,3 +315,162 @@ def plot_clusters_map(df_pivot_clusters_and_geo, geojson_data):
                 """,
                 unsafe_allow_html=True
             )
+
+
+
+import altair as alt
+import streamlit as st
+
+def plot_grouped_bar_chart(df, x_col, color_col, agg_name='count',
+                           x_title=None, y_title="Cantidad", color_title=None,
+                           proportions=False):
+    """
+    Función que agrupa y grafica un gráfico de barras usando Altair y Streamlit.
+    
+    Parámetros:
+      - df: DataFrame con los datos.
+      - x_col: Nombre de la columna que se usará en el eje x (por ejemplo, 'cluster').
+      - color_col: Nombre de la columna que se usará para diferenciar por colores (por ejemplo, 'sexo').
+      - agg_name: Nombre de la columna agregada (conteo de ocurrencias). Por defecto 'count'.
+      - x_title: Título para el eje x. Si es None se usa el nombre de x_col.
+      - y_title: Título para el eje y. Por defecto "Cantidad".
+      - color_title: Título para la leyenda de color. Si es None se usa el nombre de color_col.
+      - proportions: Booleano. Si es True, se muestran las proporciones en lugar de valores absolutos.
+    """
+    # Agrupar los datos por las columnas indicadas y contar las ocurrencias
+    df_counts = df.groupby([x_col, color_col]).size().reset_index(name=agg_name)
+    
+    if proportions:
+        # Calcular el total de cada grupo definido por x_col
+        total = df_counts.groupby(x_col)[agg_name].transform('sum')
+        # Reemplazar el conteo por la proporción
+        df_counts[agg_name] = df_counts[agg_name] / total
+        # Actualizar el título del eje y si se usa el valor por defecto
+        if y_title == "Cantidad":
+            y_title = "Proporción"
+    
+    # Definir el encoding para el eje y
+    y_encoding = alt.Y(f"{agg_name}:Q", title=y_title)
+    if proportions:
+        y_encoding = alt.Y(f"{agg_name}:Q", title=y_title, axis=alt.Axis(format='%'))
+    
+    # Configurar el tooltip; si se muestran proporciones, formatearlo como porcentaje
+    tooltip_field = [x_col, color_col, alt.Tooltip(f"{agg_name}:Q", format=".2%")] if proportions else [x_col, color_col, agg_name]
+    
+    # Crear el gráfico de barras
+    chart = alt.Chart(df_counts).mark_bar().encode(
+        x=alt.X(f"{x_col}:N", title=x_title if x_title else x_col),
+        y=y_encoding,
+        color=alt.Color(f"{color_col}:N", title=color_title if color_title else color_col),
+        tooltip=tooltip_field
+    ).interactive()
+    
+    # Quitar la cuadricula del gráfico
+    chart = chart.configure_axis(grid=False)
+    
+    # Mostrar el gráfico en Streamlit
+    st.altair_chart(chart, use_container_width=True)
+
+
+
+import streamlit as st
+
+def display_all_grouped_bar_charts(df):
+    """
+    Muestra múltiples gráficos de barras agrupadas en dos columnas, utilizando la función
+    plot_grouped_bar_chart para visualizar la proporción de cada variable en función del cluster.
+    
+    Los gráficos incluyen:
+      - Categoría delito
+      - Tipo de amenaza
+      - Momento del día
+      - Curso de vida victima
+      - Sexo
+      - Móvil víctima
+      - Móvil agresor
+    """
+    # Primera fila: dos gráficos
+    col1, col2 = st.columns(2)
+    with col1:
+        plot_grouped_bar_chart(
+            df=df, 
+            x_col='cluster', 
+            color_col='categoria_delito',
+            x_title='Cluster', 
+            y_title='Proporción', 
+            color_title='Categoría delito',
+            proportions=True
+        )
+    with col2:
+        plot_grouped_bar_chart(
+            df=df, 
+            x_col='cluster', 
+            color_col='tipo_amenaza',
+            x_title='Cluster', 
+            y_title='Proporción', 
+            color_title='Tipo de amenaza',
+            proportions=True
+        )
+
+    # Segunda fila: dos gráficos
+    col1, col2 = st.columns(2)
+    with col1:
+        plot_grouped_bar_chart(
+            df=df, 
+            x_col='cluster', 
+            color_col='momento_del_dia',
+            x_title='Cluster', 
+            y_title='Proporción', 
+            color_title='Momento del día',
+            proportions=True
+        )
+    with col2:
+        plot_grouped_bar_chart(
+            df=df, 
+            x_col='cluster', 
+            color_col='curso_vida',
+            x_title='Cluster', 
+            y_title='Proporción', 
+            color_title='Curso de vida victima',
+            proportions=True
+        )
+
+    # Tercera fila: dos gráficos
+    col1, col2 = st.columns(2)
+    with col1:
+        plot_grouped_bar_chart(
+            df=df, 
+            x_col='cluster', 
+            color_col='movil_agresor',
+            x_title='Cluster', 
+            y_title='Proporción', 
+            color_title='Móvil agresor',
+            proportions=True
+        )
+    with col2:
+        plot_grouped_bar_chart(
+            df=df, 
+            x_col='cluster', 
+            color_col='movil_victima',
+            x_title='Cluster', 
+            y_title='Proporción', 
+            color_title='Móvil víctima',
+            proportions=True
+        )
+
+    # Cuarta fila: último gráfico en la primera columna
+    col1, col2 = st.columns(2)
+    with col1:
+          plot_grouped_bar_chart(
+            df=df, 
+            x_col='cluster', 
+            color_col='sexo',
+            x_title='Cluster', 
+            y_title='Proporción', 
+            color_title='Sexo',
+            proportions=True
+        )
+
+
+
+
