@@ -461,7 +461,8 @@ def display_all_grouped_bar_charts(df):
     # Cuarta fila: último gráfico en la primera columna
     col1, col2 = st.columns(2)
     with col1:
-          plot_grouped_bar_chart(
+     pass
+    plot_grouped_bar_chart(
             df=df, 
             x_col='cluster', 
             color_col='sexo',
@@ -470,7 +471,45 @@ def display_all_grouped_bar_charts(df):
             color_title='Sexo',
             proportions=True
         )
+    with col2:
+        pass
+    plot_grouped_bar_chart(
+            df=df, 
+            x_col='cluster', 
+            color_col='grupo_sitio',
+            x_title='Cluster', 
+            y_title='Proporción', 
+            color_title='Grupo_sitio',
+            proportions=True
+        )
 
 
 
 
+
+
+def plot_heatmap_grupos_areas(df):
+    """
+    Grafica un heatmap que muestra la distribución normalizada (proporción) de cada combinación
+    de "cluster" y "grupo_sitio" en el DataFrame.
+    """
+    # Agrupar los datos para obtener el conteo por cluster y grupo_sitio
+    df_heat = df.groupby(['cluster', 'grupo_sitio']).size().reset_index(name='count')
+    
+    # Calcular el total de cada cluster para normalizar los conteos
+    df_heat['total_cluster'] = df_heat.groupby('cluster')['count'].transform('sum')
+    df_heat['proportion'] = df_heat['count'] / df_heat['total_cluster']
+    
+    # Crear el heatmap usando la proporción en lugar del conteo absoluto
+    heatmap = alt.Chart(df_heat).mark_rect().encode(
+        x=alt.X("cluster:N", title="Cluster"),
+        y=alt.Y("grupo_sitio:N", title="Grupo de Áreas"),
+        color=alt.Color("proportion:Q", title="Proporción", scale=alt.Scale(scheme="blues")),
+        tooltip=["cluster", "grupo_sitio", alt.Tooltip("proportion:Q", format=".2%")]
+    ).properties(
+        width=300,
+        height=200,
+        title="Distribución Normalizada de Grupos de Áreas por Cluster"
+    ).interactive()
+    
+    st.altair_chart(heatmap, use_container_width=True)

@@ -5,7 +5,8 @@ from src.EDA.category_papping import (
                                     CRIME_CATEGORY_DICT,
                                     TRANSPORT_MODE_DICT,
                                     WEAPON_THREAT_DICT , 
-                                    AGE_GROUP_DICT
+                                    AGE_GROUP_DICT,
+                                    SITE_GROUP_DICT
 )
 
 
@@ -136,6 +137,8 @@ def create_new_columns_crimes(df):
 
     df['tipo_amenaza'] = df['armas_medios'].map(WEAPON_THREAT_DICT).fillna("Otros y Sin Información")
 
+    df['grupo_sitio'] = df['clase_sitio'].map(SITE_GROUP_DICT).fillna("Otros") # df['clase_sitio'].apply(map_site_group)
+
     return df
 
 def drop_columns_crimes(df):
@@ -144,7 +147,7 @@ def drop_columns_crimes(df):
                         'armas_medios' ,
                         'barrios_hecho',
                         'edad',
-                        'clase_sitio',
+                       # 'clase_sitio',
                         'articulo',
                         'delito_solo',
                         'rango_horario',

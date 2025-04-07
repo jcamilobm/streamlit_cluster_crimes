@@ -286,7 +286,18 @@ if posFilaSeleccionada != "Sin seleccion de fila" :
     # new: 06/04/2025
     #st.dataframe(df_identifiers)
     #st.dataframe(labels)
-    #st.dataframe(df_crimes)
+    #new
+    st.dataframe(df_crimesf)
+    st.dataframe(df_crimesf.clase_sitio.unique())
+    # Calcular el conteo de cada categoría en 'clase_sitio'
+    conteos = df_crimesf['clase_sitio'].value_counts().reset_index()
+    conteos.columns = ['clase_sitio', 'conteo']
+
+    # Mostrar el resultado en un dataframe de Streamlit
+    st.dataframe(conteos)
+
+    # end new
+
     df_pivot_with_labels = pd.concat([ df_identifiers , pd.Series(labels,name="cluster")],axis=1)
     #st.dataframe(df_pivot_with_labels)
     df_crimes_cluster = df_pivot_with_labels.merge(df_crimesf, on="num_com", how="inner")
@@ -318,6 +329,7 @@ if posFilaSeleccionada != "Sin seleccion de fila" :
 
 
     display_all_grouped_bar_charts(df_crimes_cluster)
+  
 
     #--------------------------------------------------------------------------------
     #  LLM
