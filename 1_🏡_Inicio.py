@@ -281,22 +281,7 @@ if posFilaSeleccionada != "Sin seleccion de fila" :
     labels = st.session_state.results[posFilaSeleccionada]['Labels']
      
     metric_silueta = st.session_state.results[posFilaSeleccionada]['Silhouette Score']
-    #metric_inercia = st.session_state.results[posFilaSeleccionada]['Labels']
 
-    # new: 06/04/2025
-    #st.dataframe(df_identifiers)
-    #st.dataframe(labels)
-    #new
-    st.dataframe(df_crimesf)
-    st.dataframe(df_crimesf.clase_sitio.unique())
-    # Calcular el conteo de cada categoría en 'clase_sitio'
-    conteos = df_crimesf['clase_sitio'].value_counts().reset_index()
-    conteos.columns = ['clase_sitio', 'conteo']
-
-    # Mostrar el resultado en un dataframe de Streamlit
-    st.dataframe(conteos)
-
-    # end new
 
     df_pivot_with_labels = pd.concat([ df_identifiers , pd.Series(labels,name="cluster")],axis=1)
     #st.dataframe(df_pivot_with_labels)
