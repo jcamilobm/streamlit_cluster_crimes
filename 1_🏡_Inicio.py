@@ -204,10 +204,21 @@ df_model_scaled = scale_data(df_model, scaling_method)
 with st.expander("Ver tabla para el modelo escalada"):
     st.dataframe(df_model_scaled)
 
-col_run, col_reset = st.columns(2)
-run_model = col_run.button('🚀 Ejecutar Modelo', type="primary", on_click=deshabilitar_filtros_ejecutar_un_modelo, disabled = st.session_state.deshabilitar_boton_ejecutar_modelo)
-run_many_experiments = col_run.button('🚀 Ejecutar varias pruebas', type="primary", on_click=deshabilitar_filtros_run_many_experiments, disabled = st.session_state.deshabilitar_boton_run_many_experiments)
-reset_results = col_reset.button('🗑️ Borrar Resultados', type="secondary", on_click=habilitar_filtros)
+#col_run, col_reset = st.columns(2)
+#run_model = col_run.button('🚀 Ejecutar Modelo', type="primary", on_click=deshabilitar_filtros_ejecutar_un_modelo, disabled = st.session_state.deshabilitar_boton_ejecutar_modelo)
+#run_many_experiments = col_run.button('🚀 Ejecutar varias pruebas', type="primary", on_click=deshabilitar_filtros_run_many_experiments, disabled = st.session_state.deshabilitar_boton_run_many_experiments)
+#reset_results = col_reset.button('🗑️ Borrar Resultados', type="secondary", on_click=habilitar_filtros)
+
+col_run, col_run_many, col_reset = st.columns(3)
+with col_run:
+    run_model = st.button('🚀 Ejecutar Modelo', type="primary", on_click=deshabilitar_filtros_ejecutar_un_modelo, disabled=st.session_state.deshabilitar_boton_ejecutar_modelo)
+with col_run_many:
+    run_many_experiments = st.button('🔁 Ejecutar varias pruebas', type="primary", on_click=deshabilitar_filtros_run_many_experiments, disabled=st.session_state.deshabilitar_boton_run_many_experiments)
+
+with col_reset:
+    reset_results = st.button('🗑️ Borrar Resultados', type="secondary", on_click=habilitar_filtros)
+
+
 st.markdown("---")
 
 if run_model:
