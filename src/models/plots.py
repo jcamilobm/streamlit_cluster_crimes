@@ -318,7 +318,7 @@ def plot_clusters_map(df_pivot_clusters_and_geo, geojson_data):
                 f"""
                 <div style='display: flex; align-items: center; margin-bottom: 10px;'>
                     <div style='width: 20px; height: 20px; background-color: {color}; margin-right: 10px;'></div>
-                    <span>C {cluster}</span>
+                    <span>C. {cluster}</span>
                 </div>
                 """,
                 unsafe_allow_html=True
