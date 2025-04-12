@@ -131,6 +131,14 @@ def plot_heatmap_clusters_kmeans(  data , model_kmeans):
   plt.clf()
 
 
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.cluster.hierarchy import dendrogram, linkage, fcluster
+
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.cluster.hierarchy import dendrogram, linkage, fcluster
+
 def plot_dendrogram_jerarquico(data, num_clusters, method='ward', metric='euclidean', title='Dendrograma'):
     """
     Genera y muestra un dendrograma coloreado para datos utilizando agrupamiento jerárquico.
@@ -293,8 +301,8 @@ def plot_clusters_map(df_pivot_clusters_and_geo, geojson_data):
     # Añadir botón de pantalla completa
     Fullscreen(position="topright").add_to(mapa)
 
-    # Dividir en dos columnas (70% mapa, 30% leyenda)
-    col1, col2 = st.columns([0.7, 0.3])
+    # Dividir en dos columnas (80% mapa, 20% leyenda)
+    col1, col2 = st.columns([0.80, 0.20])
 
     with col1:
         st_folium(mapa, width=300, height=330)
@@ -310,7 +318,7 @@ def plot_clusters_map(df_pivot_clusters_and_geo, geojson_data):
                 f"""
                 <div style='display: flex; align-items: center; margin-bottom: 10px;'>
                     <div style='width: 20px; height: 20px; background-color: {color}; margin-right: 10px;'></div>
-                    <span>Cluster {cluster}</span>
+                    <span>C {cluster}</span>
                 </div>
                 """,
                 unsafe_allow_html=True
