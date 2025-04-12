@@ -311,6 +311,7 @@ if posFilaSeleccionada != "Sin seleccion de fila" :
             plot_heatmap_clusters_kmeans(df_model,model)
     else:
             plot_dendrogram_jerarquico(df_model, n_clusters)
+    
 
 
     display_all_grouped_bar_charts(df_crimes_cluster)
