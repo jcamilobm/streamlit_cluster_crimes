@@ -325,7 +325,7 @@ if posFilaSeleccionada != "Sin seleccion de fila" :
     
 
 
-    display_all_grouped_bar_charts(df_crimes_cluster)
+    #display_all_grouped_bar_charts(df_crimes_cluster)
   
 
     #--------------------------------------------------------------------------------
