@@ -297,7 +297,7 @@ if posFilaSeleccionada != "Sin seleccion de fila" :
     df_pivot_with_labels = pd.concat([ df_identifiers , pd.Series(labels,name="cluster")],axis=1)
     #st.dataframe(df_pivot_with_labels)
     df_crimes_cluster = df_pivot_with_labels.merge(df_crimesf, on="num_com", how="inner")
-    #st.dataframe(df_crimes_cluster
+    #st.dataframe(df_crimes_cluster)
 
     # end 06/04/2025
 
@@ -343,16 +343,32 @@ if posFilaSeleccionada != "Sin seleccion de fila" :
     zonas_list_with_clusters = llm_assign_clusters_to_zonas_list(zonas_list, dict_results['Labels'])
 
 
+
+   # st.markdown("testsssssss")
+   # st.dataframe(df_crimes_cluster)
+    cols = ["sexo", "movil_victima","movil_agresor","grupo_sitio","curso_vida","dia_nombre","categoria_delito","momento_del_dia",
+            "tipo_amenaza"]
+    proporciones_por_dimension = llm_calcular_proporciones_por_dimension(df_crimes_cluster, "cluster", cols)
+   # st.dataframe(proporciones_por_dimension)
+   # st.markdown("testsssssssss")
+
+    st.markdown("---")
+
     dict_api_prompt_llm =  {
+        "esquema": {
+            "informacion_modelo": "Metadatos del entrenamiento y configuración del modelo",
+            "resultados_modelo": "Salidas crudas de sklearn (labels_, proporciones_clusters_, métricas_, linkage_summary_)",
+            "comunas": "Lista de comunas con atributos RME, descripción y cluster asignado",
+            "proporciones_por_dimension": "Mapea cada cluster a las proporciones internas (0–1)"
+        },
        "informacion_modelo": dict_model_info  ,
        "resultados_modelo": dict_sklearn_model ,
-       "comunas": zonas_list_with_clusters
+       "comunas": zonas_list_with_clusters,
+       "proporciones_por_dimension": proporciones_por_dimension
     }
 
     json_string_prompt_llm   = json.dumps( dict_api_prompt_llm  , indent=4)
 
-
-    st.markdown("---")
 
     # Mensaje dinámico indicando el modelo cargado actualmente
     

@@ -167,3 +167,58 @@ def llm_assign_clusters_to_zonas_list(zonas_list, labels):
         zona["cluster_asignado"] = int(labels[i])
     
     return zonas_list
+
+
+
+
+def llm_calcular_proporciones_por_dimension(
+    df: pd.DataFrame,
+    cluster_col: str = "cluster",
+    dimensiones: list = None
+) -> dict:
+    """
+    Calcula las proporciones normalizadas (0–1) de cada categoría
+    para cada dimensión, por cluster.
+
+    Parámetros
+    ----------
+    df : pd.DataFrame
+        DataFrame que debe incluir una columna con el identificador de cluster
+        y una columna por cada dimensión de la que se quieran proporciones.
+    cluster_col : str
+        Nombre de la columna con las etiquetas de cluster.
+    dimensiones : list de str
+        Lista de nombres de columna correspondientes a las dimensiones:
+        p.ej. ["tipo_delito","arma","momento","edad","movilidad","ubicacion"].
+        Si es None, tomará todas las columnas distintas a `cluster_col`.
+
+    Retorna
+    -------
+    dict
+        Estructura:
+        {
+          "0": { "tipo_delito": {"violencia_intrafamiliar":0.32, ...}, 
+                 "arma": {...}, ... },
+          "1": { ... },
+           …
+        }
+    """
+    if dimensiones is None:
+        dimensiones = [c for c in df.columns if c != cluster_col]
+
+    proporciones = {}
+    # Agrupamos por cada cluster
+    for clust, subdf in df.groupby(cluster_col):
+        proporciones[str(clust)] = {}
+        # Para cada dimensión calculamos value_counts(normalize=True)
+        for dim in dimensiones:
+            vc = subdf[dim].value_counts(normalize=True).round(2)
+            proporciones[str(clust)][dim] = vc.to_dict()
+
+    return proporciones
+
+# Ejemplo de uso:
+# df_crimenes = pd.read_csv("datos_crimenes.csv")
+# cols = ["tipo_delito","arma","momento","edad","movilidad","ubicacion"]
+# proporciones = calcular_proporciones_por_dimension(df_crimenes, "cluster", cols)
+# dict_api_prompt_llm["proporciones_por_dimension"] = proporciones
