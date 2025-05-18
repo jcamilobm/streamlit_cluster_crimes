@@ -33,6 +33,7 @@ llm:
     1. **Resumen General:** Qué revelan los datos sobre la criminalidad en la ciudad. Destaca tendencias o anomalías importantes basándote en `proporciones_clusters_` y `proporciones_por_dimension`.  
     2. **Análisis por Cluster:** Para cada `cluster_n`, describe:
        - Nombre representativo inferido por ti.  
+       - Comunas asignadas al cluster. 
        - Tipo de delito predominante (`categoria_delito`) y matices clave de `proporciones_por_dimension` (arma, momento, edad, movilidad, ubicación).  
        - Nivel de riesgo (peso % del cluster y métricas de separación si aplica).  
     3. **Recomendaciones Estratégicas:** Estrategias específicas por cluster (patrullaje, campañas, inteligencia) alineadas con sus proporciones internas y contexto socioeconómico (`informacion_modelo`).  
@@ -68,7 +69,8 @@ llm:
 
     1. **Resumen General:** Qué revelan los datos sobre la criminalidad en la ciudad. Destaca tendencias o anomalías importantes basándote en `proporciones_clusters_` y `proporciones_por_dimension`.  
     2. **Análisis por Cluster:** Para cada `cluster_n`, describe:
-       - Nombre representativo inferido por ti.  
+       - Nombre representativo inferido por ti. 
+       - Comunas asignadas al cluster. 
        - Tipo de delito predominante (`categoria_delito`) y matices clave de `proporciones_por_dimension` (arma, momento, edad, movilidad, ubicación).  
        - Nivel de riesgo (peso % del cluster y métricas de separación si aplica).  
     3. **Recomendaciones Estratégicas:** Estrategias específicas por cluster (patrullaje, campañas, inteligencia) alineadas con sus proporciones internas y contexto socioeconómico (`informacion_modelo`).  
