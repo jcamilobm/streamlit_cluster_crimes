@@ -7,7 +7,8 @@ llm:
   model_default: minimax/minimax-m2:free
   models:
   - minimax/minimax-m2:free
-  - deepseek/deepseek-r1-distill-llama-70b:free
+  - tngtech/deepseek-r1t2-chimera:free
+  - openrouter/polaris-alpha
   system_prompt: "Reglas:\n  1. Solo uses los porcentajes que vienen en `proporciones_por_dimension`.\n\
     \  2. No inventes ni estimes ningún valor que no esté explícito en el JSON.\n\
     \  3. Para cada `cluster_n`, infiere de forma autónoma un nombre representativo\
