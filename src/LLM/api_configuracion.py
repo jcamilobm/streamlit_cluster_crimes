@@ -41,7 +41,7 @@ def send_llm_request(
     config = load_config()
     #system_prompt = system_prompt or config.get("llm", {}).get("system_prompt", "Eres un asistente de IA.")
     system_prompt = st.session_state["llm_prompt_combined"]
-    st.text_area("System Prompt enviado por api:", value=system_prompt, height=400)
+  #  st.text_area("System Prompt enviado por api:", value=system_prompt, height=400)
     model = model or config.get("llm", {}).get("model", "meta-llama/llama-3.3-70b-instruct:free")
     temperature = temperature if temperature is not None else config.get("llm", {}).get("temperature", 0.7)
     base_url = base_url or config.get("llm", {}).get("base_url", "https://openrouter.ai/api/v1")
