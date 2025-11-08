@@ -6,6 +6,7 @@ __pycache__/
 # Archivos de dependencias y entorno virtual
 env/
 venv/
+venv312/
 *.env
 
 # Ignore Streamlit secrets
