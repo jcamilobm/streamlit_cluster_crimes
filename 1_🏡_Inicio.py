@@ -10,7 +10,12 @@ from src.components.HelpUser import *
 from src.LLM.data_manager_llm import *
 from src.LLM.api_configuracion import send_llm_request
 
+from src.LLM.init_prompt import init_prompt_defaults
+
 from src.utils.config_loader import load_config
+
+config = load_config()
+llm_config = config.get("llm", {})
 
 st.set_page_config(
     page_title="Experimentos modelos",
@@ -50,8 +55,24 @@ def habilitar_filtros():
     st.session_state.results = []
 
 config = load_config() 
-system_prompt = config["llm"]["system_prompt"]
-model_llm = config["llm"]["model"]    
+
+# viejo system_prompt = config["llm"]["system_prompt"]
+
+
+
+# ============================================================
+# 🧩 Recuperar el prompt activo (seguro)
+# ============================================================
+# ------------------------------------------------------------
+# 🧠 Cargar el prompt en memoria (session_state o default)
+# ------------------------------------------------------------
+if "llm_prompt_combined" not in st.session_state:
+    # Si no existe aún, se carga el prompt por defecto
+    init_prompt_defaults("llm_prompt")
+
+# Siempre toma el valor actual desde la sesión
+system_prompt = st.session_state["llm_prompt_combined"]
+
 
 
 #1. Titulo
@@ -372,11 +393,15 @@ if posFilaSeleccionada != "Sin seleccion de fila" :
 
     # Mensaje dinámico indicando el modelo cargado actualmente
     
-    help_text = f"Modelo actual cargado: {model_llm}"
+    help_text = f"Modelo actual cargado: {llm_config.get("model", "No definido")}"
 
     with st.expander("Despliega para ver detalles del prompt"):
-            st.write(f"**Modelo lenguaje:** {model_llm}")
-            st.write(f"**Prompt del sistema:** {system_prompt}")
+            st.write(f"**Modelo lenguaje:** {llm_config.get("model", "No definido")}")
+
+           # system_prompt = st.session_state.get("llm_prompt_combined", "⚠️ No se ha inicializado el prompt en la sesión.")
+            st.markdown("**Prompt del sistema actual:**")
+            st.text_area("Prompt del sistema", value=system_prompt, height=400)
+
             st.json(json_string_prompt_llm)
 
     if st.button("🤖 Interpretar resultados con IA", type="primary", help=help_text):

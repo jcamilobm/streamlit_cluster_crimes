@@ -5,6 +5,10 @@ from src.utils.config_loader import load_config
 from src.utils.secrets import get_secret
 import streamlit as st
 
+from src.LLM.init_prompt import init_prompt_defaults
+if "llm_prompt_combined" not in st.session_state:
+    # Si no existe aún, se carga el prompt por defecto
+    init_prompt_defaults("llm_prompt")
 
 
 def send_llm_request(
@@ -35,7 +39,9 @@ def send_llm_request(
 
     # Cargar configuración si faltan parámetros
     config = load_config()
-    system_prompt = system_prompt or config.get("llm", {}).get("system_prompt", "Eres un asistente de IA.")
+    #system_prompt = system_prompt or config.get("llm", {}).get("system_prompt", "Eres un asistente de IA.")
+    system_prompt = st.session_state["llm_prompt_combined"]
+    st.text_area("System Prompt enviado por api:", value=system_prompt, height=400)
     model = model or config.get("llm", {}).get("model", "meta-llama/llama-3.3-70b-instruct:free")
     temperature = temperature if temperature is not None else config.get("llm", {}).get("temperature", 0.7)
     base_url = base_url or config.get("llm", {}).get("base_url", "https://openrouter.ai/api/v1")
