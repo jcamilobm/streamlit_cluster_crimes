@@ -7,7 +7,7 @@ llm:
   model_default: meta-llama/llama-3.3-70b-instruct:free
   models:
   - meta-llama/llama-3.3-70b-instruct:free
-  - nousresearch/hermes-3-llama-3.1-405b:free
+  - nousresearch/hermes-3-llama-3.1-405b:free 
   - meta-llama/llama-3.3-8b-instruct:free
   system_prompt: "Reglas:\n  1. Solo uses los porcentajes que vienen en `proporciones_por_dimension`.\n\
     \  2. No inventes ni estimes ningún valor que no esté explícito en el JSON.\n\
