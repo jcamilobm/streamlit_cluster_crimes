@@ -3,12 +3,12 @@ clustering:
   n_clusters: 4
 llm:
   base_url: https://openrouter.ai/api/v1
-  model: minimax/minimax-m2:free
-  model_default: minimax/minimax-m2:free
+  model: meta-llama/llama-3.3-70b-instruct:free
+  model_default: meta-llama/llama-3.3-70b-instruct:free
   models:
-  - minimax/minimax-m2:free
-  - tngtech/deepseek-r1t2-chimera:free
-  - openrouter/polaris-alpha
+  - meta-llama/llama-3.3-70b-instruct:free
+  - nousresearch/hermes-3-llama-3.1-405b:free
+  - meta-llama/llama-3.3-8b-instruct:free
   system_prompt: "Reglas:\n  1. Solo uses los porcentajes que vienen en `proporciones_por_dimension`.\n\
     \  2. No inventes ni estimes ningún valor que no esté explícito en el JSON.\n\
     \  3. Para cada `cluster_n`, infiere de forma autónoma un nombre representativo\
